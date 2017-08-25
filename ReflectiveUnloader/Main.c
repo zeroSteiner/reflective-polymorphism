@@ -3,9 +3,14 @@
 
 VOID DumpImage(LPCSTR pFile, PVOID pBaseAddress, SIZE_T dwSize) {
 	HANDLE hFile;
+	DWORD dwNumberOfBytesWritten;
 
 	hFile = CreateFile(pFile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	WriteFile(hFile, pBaseAddress, (DWORD)dwSize, NULL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		printf("Failed to open the file for writting.\n");
+		return;
+	}
+	WriteFile(hFile, pBaseAddress, (DWORD)dwSize, &dwNumberOfBytesWritten, NULL);
 	CloseHandle(hFile);
 }
 
