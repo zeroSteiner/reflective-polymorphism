@@ -10,8 +10,8 @@
 #endif
 
 typedef struct {
-	WORD	offset : 12;
-	WORD	type : 4;
+	WORD    offset : 12;
+	WORD    type   : 4;
 } IMAGE_RELOC, *PIMAGE_RELOC;
 
 ULONG_PTR RawAddressFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress) {
@@ -207,6 +207,8 @@ BOOL ReflectiveUnloaderRestoreWritable(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAd
 
 VOID ReflectiveUnloaderFree(PVOID pAddress, SIZE_T dwSize) {
 	/*
+	 * Free memory that was previously allocated by ReflectiveUnloader().
+	 *
 	 * PVOID  pAddress: Pointer to the blob returned by ReflectiveUnloader
 	 * SIZE_T dwSize:   Size of the blob returned by ReflectiveUnloader
 	 */
@@ -221,8 +223,11 @@ VOID ReflectiveUnloaderFree(PVOID pAddress, SIZE_T dwSize) {
 
 PVOID ReflectiveUnloader(HINSTANCE hInstance, PSIZE_T pdwSize) {
 	/*
+	 * Unload the module indicated by hInstance and return a pointer to it's
+	 * location in memory. If this function fails, NULL is returned.
+	 *
 	 * HINSTANCE hInstance: Handle to the module instance to unload from memory
-	 * PSIZE_T   pdwSize:   Size of the returned blob
+	 * PSIZE_T   pdwSize:   The size of the returned PE image
 	 */
 	PDOS_HEADER pDosHeader = NULL;
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
@@ -263,7 +268,7 @@ PVOID ReflectiveUnloader(HINSTANCE hInstance, PSIZE_T pdwSize) {
 	pImgSecHeader = (PIMAGE_SECTION_HEADER)((ULONG_PTR)pImgNtHeaders + sizeof(IMAGE_NT_HEADERS));
 
 	/*
-	* 0x400000 for EXEs and 0x10000000 for DLLs
+	* 0x00400000 for EXEs and 0x10000000 for DLLs
 	* see: https://msdn.microsoft.com/en-us/library/windows/desktop/ms680339(v=vs.85).aspx
 	*/
 	if (pImgNtHeaders->FileHeader.Characteristics & IMAGE_FILE_DLL) {
