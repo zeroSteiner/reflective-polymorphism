@@ -32,6 +32,10 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import argparse
 import copy
 import math
@@ -102,17 +106,17 @@ def pe_patch(pe):
 	pe.__structures__.append(backup_section)
 	pe.FILE_HEADER.NumberOfSections += 1
 
-	new_section = b''
+	new_section = bytearray()
 	for section_idx, section in enumerate(writable_sections, -1):  # start at -1 to account for the null-terminator section header
 		section = copy.copy(section)
 		section.Characteristics ^= IMAGE_SCN_MEM_WRITE
 		section.PointerToRawData = backup_section.PointerToRawData + ((len(writable_sections) - section_idx) * SIZEOF_SECTION_HEADER)
 		new_section += section.__pack__()
-	new_section += b'\x00' * SIZEOF_SECTION_HEADER  # add the null-terminator section header
+	new_section += bytearray(SIZEOF_SECTION_HEADER)  # add the null-terminator section header
 	for section in writable_sections:
 		new_section += section.get_data()
 	backup_section.Misc = len(new_section)
-	new_section += b'\x00' * (align_up(len(new_section), pe.OPTIONAL_HEADER.FileAlignment) - len(new_section))
+	new_section += bytearray(int(align_up(len(new_section), pe.OPTIONAL_HEADER.FileAlignment) - len(new_section)))
 	pe_insert(pe, new_section, backup_section.PointerToRawData)
 	backup_section.SizeOfRawData = len(new_section)
 	pe.OPTIONAL_HEADER.SizeOfImage = align_up(pe.OPTIONAL_HEADER.SizeOfImage + len(new_section), pe.OPTIONAL_HEADER.SectionAlignment)
