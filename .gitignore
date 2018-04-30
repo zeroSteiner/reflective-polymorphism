@@ -1,7 +1,8 @@
+*.dll
+*.exe
+*.vcxproj.user
 .vs/*
 Release/
 Debug/
 x64/
 ReflectiveUnloader.v12.suo
-*.dll
-*.exe

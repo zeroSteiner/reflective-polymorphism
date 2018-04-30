@@ -21,9 +21,15 @@
     <ClCompile Include="Main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\ReflectiveDLLInjection\dll\src\ReflectiveLoader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReflectiveUnloader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ReflectiveDLLInjection\dll\src\ReflectiveLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
