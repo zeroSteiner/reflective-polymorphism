@@ -16,7 +16,8 @@ of the unloaded target module.
    * For a DLL this could be `hinstDLL` from `DllMain`<sup>[2][3]</sup>
 1. After compiling the project, run `pe_patch.py` to patch in necessary data to
    the pe file. Without this step, the writable sections of the PE file will be
-   corrupted in the unloaded copy.
+   corrupted in the unloaded copy. (See [below](#visual-studio-build-event) for
+   how to automate this.)
 
 ### PE Patching
 It's necessary to patch the PE file to get a perfect byte-for-byte copy when it
@@ -29,6 +30,18 @@ If the `.restore` section is not present, the unloader will simply skip this
 step. This allows the unloader to perform the same task for arbitrary unpatched
 PE files, however **any modifications to segments made at runtime will be present
 in the unloaded PE file**.
+
+#### Visual Studio Build Event
+The `pe_patch.py` script can be executed automatically for every build using a
+build event. Right click the project in Solution Explorer, then navigate to
+`Configuration Properties > Build Events > Post Build Event` and adjust the
+settings as follows:
+
+| Setting Name | Setting Value                                                      |
+|--------------|--------------------------------------------------------------------|
+| Command Line | `python $(SolutionDir)pe_patch.py "$(TargetPath)" "$(TargetPath)"` |
+| Description  | Patch in the .restore section                                      |
+| Use In Build | Yes                                                                |
 
 ### API Reference
 #### ReflectiveUnloader
