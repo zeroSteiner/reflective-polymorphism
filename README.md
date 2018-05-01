@@ -9,6 +9,7 @@ of the unloaded target module.
 
 ## Usage
 
+1. The build environment is Visual Studio 2017.
 1. Add `ReflectiveUnloader.c \ ReflectiveUnloader.h` to the desired project.
    Once added, call `ReflectiveUnloader()` with a handle to the module to unload
    and reconstruct.
@@ -28,8 +29,8 @@ original contents to the writable sections.
 
 If the `.restore` section is not present, the unloader will simply skip this
 step. This allows the unloader to perform the same task for arbitrary unpatched
-PE files, however **any modifications to segments made at runtime will be present
-in the unloaded PE file**.
+PE files, however **any modifications to segments made at runtime will be
+present in the unloaded PE file**.
 
 #### Visual Studio Build Event
 The `pe_patch.py` script can be executed automatically for every build using a
@@ -78,6 +79,22 @@ VOID ReflectiveUnloaderFree(
 *dwSize* \[in\]
 > Size of the blob returned by ReflectiveUnloader
 
+## Proof of Concept
+The proof of concept included in the project is the `Main.c` file. This can be
+compiled into a `ReflectiveUnloader.dll` which is compartible with
+[Reflective DLL Injection][1]. The resulting executable can then be injected
+into an arbitrary process (assuming premissions and architecture constraints are
+met) with the [inject.exe][4] utility. Take note of the hash of the DLL file
+before proceeding. See the [releases page][5] for pre-built binaries.
+
+Once the DLL is injected into a process, it will display a message box. This is
+used to present the user with an opportunity to delete the original DLL from
+disk. After the message box is closed, a new and identical copy will be written
+to `%USERPROFILE%\\Desktop\\ReflectiveUnloader.dll`.
+
+Finally the user can compare the hashes of the two files to determine that they
+are identical.
+
 ## License
 This project is released under the BSD 3-clause license, for more details see
 the [LICENSE][license-url] file.
@@ -90,4 +107,6 @@ the [LICENSE][license-url] file.
 [1]: https://github.com/stephenfewer/ReflectiveDLLInjection
 [2]: https://msdn.microsoft.com/en-us/library/windows/desktop/ms683199(v=vs.85).aspx
 [3]: https://msdn.microsoft.com/en-us/library/windows/desktop/ms682583(v=vs.85).aspx
+[4]: https://github.com/stephenfewer/ReflectiveDLLInjection/tree/master/bin
+[5]: https://github.com/zeroSteiner/reflective-unloader/releases
 [license-url]: https://github.com/zeroSteiner/reflective-unloader/blob/master/LICENSE

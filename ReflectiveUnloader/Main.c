@@ -33,7 +33,13 @@ VOID ProofOfConcept(HINSTANCE hInstance) {
 		return;
 	}
 
-	dwChars = ExpandEnvironmentStrings(_T("%USERPROFILE%\\Desktop\\unloaded.dll"), ctPath, MAX_PATH + 1);
+#ifdef _WIN64
+	dwChars = ExpandEnvironmentStrings(_T("%USERPROFILE%\\Desktop\\ReflectiveUnloader.x64.dll"), ctPath, MAX_PATH + 1);
+#else
+#ifdef _WIN32
+	dwChars = ExpandEnvironmentStrings(_T("%USERPROFILE%\\Desktop\\ReflectiveUnloader.x86.dll"), ctPath, MAX_PATH + 1);
+#endif
+#endif
 	if ((dwChars == 0) || (dwChars > MAX_PATH + 1)) {
 		MessageBox(NULL, _T("Could not get the file path for writing."), _T("Failed"), MB_OK);
 		return;
