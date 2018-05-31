@@ -1,73 +1,73 @@
 #include "ReflectiveUnloader.h"
 
-// see: https://msdn.microsoft.com/en-us/library/f7f5138s.aspx
-#ifdef _WIN64
-#define IMAGE_BASE_DLL 0x180000000
-#define IMAGE_BASE_EXE 0x140000000
-#else
-#define IMAGE_BASE_DLL 0x10000000
-#define IMAGE_BASE_EXE 0x400000
-#endif
-
 typedef struct {
-	WORD    offset : 12;
-	WORD    type   : 4;
+	WORD    offset :12;
+	WORD    type   :4;
 } IMAGE_RELOC, *PIMAGE_RELOC;
 
-ULONG_PTR RawAddressFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress) {
+PIMAGE_SECTION_HEADER SectionHeaderFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pAddress) {
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
-	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
-	PIMAGE_DATA_DIRECTORY pImgDataDirectory = NULL;
-	DWORD dwSecCursor;
-	ULONG_PTR uiAddress;
-
-	pImgNtHeaders = (PIMAGE_NT_HEADERS)((ULONG_PTR)pDosHeader + pDosHeader->e_lfanew);
-	pImgDataDirectory = &pImgNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
-	if (!pImgDataDirectory->Size) {
-		return 0;
-	}
-
-	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = pImgSecHeader = (PIMAGE_SECTION_HEADER)((ULONG_PTR)pImgNtHeaders + sizeof(IMAGE_NT_HEADERS));
-	for (dwSecCursor = 0; dwSecCursor < pImgNtHeaders->FileHeader.NumberOfSections; dwSecCursor++) {
-		pImgSecHeaderCursor = &pImgSecHeader[dwSecCursor];
-		if (!pImgSecHeaderCursor->SizeOfRawData) {
-			continue;
-		}
-		if (pVirtualAddress < pImgSecHeaderCursor->VirtualAddress) {
-			continue;
-		}
-		if (pVirtualAddress >= pImgSecHeaderCursor->VirtualAddress + pImgSecHeaderCursor->SizeOfRawData) {
-			continue;
-		}
-		uiAddress = (ULONG_PTR)pDosHeader;
-		uiAddress += pVirtualAddress - pImgSecHeaderCursor->VirtualAddress;
-		uiAddress += pImgSecHeaderCursor->PointerToRawData;
-		return uiAddress;
-	}
-	return 0;
-}
-
-PIMAGE_SECTION_HEADER SectionHeaderFromName(PIMAGE_NT_HEADERS pImgNtHeaders, PVOID pName) {
 	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = NULL;
 	DWORD dwCursor = 0;
 
+	pImgNtHeaders = (PIMAGE_NT_HEADERS)((ULONG_PTR)pDosHeader + pDosHeader->e_lfanew);
 	pImgSecHeader = (PIMAGE_SECTION_HEADER)((ULONG_PTR)pImgNtHeaders + sizeof(IMAGE_NT_HEADERS));
 	for (dwCursor = 0; dwCursor < pImgNtHeaders->FileHeader.NumberOfSections; dwCursor++) {
 		pImgSecHeaderCursor = &pImgSecHeader[dwCursor];
-		if (!memcmp(pImgSecHeaderCursor->Name, pName, 8)) {
-			return pImgSecHeaderCursor;
+		if (!pImgSecHeaderCursor->SizeOfRawData) {
+			continue;
 		}
+		if (pAddress < pImgSecHeaderCursor->VirtualAddress) {
+			continue;
+		}
+		if (pAddress >= pImgSecHeaderCursor->VirtualAddress + pImgSecHeaderCursor->SizeOfRawData) {
+			continue;
+		}
+		return pImgSecHeaderCursor;
 	}
 	return NULL;
 }
 
-DWORD ImageSizeFromHeaders(PIMAGE_NT_HEADERS pImgNtHeaders) {
+PIMAGE_SECTION_HEADER SectionHeaderFromName(PDOS_HEADER pDosHeader, PVOID pName) {
+	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
+	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
+	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = NULL;
+	DWORD dwCursor = 0;
+
+	pImgNtHeaders = (PIMAGE_NT_HEADERS)((ULONG_PTR)pDosHeader + pDosHeader->e_lfanew);
+	pImgSecHeader = (PIMAGE_SECTION_HEADER)((ULONG_PTR)pImgNtHeaders + sizeof(IMAGE_NT_HEADERS));
+	for (dwCursor = 0; dwCursor < pImgNtHeaders->FileHeader.NumberOfSections; dwCursor++) {
+		pImgSecHeaderCursor = &pImgSecHeader[dwCursor];
+		if (memcmp(pImgSecHeaderCursor->Name, pName, 8)) {
+			continue;
+		}
+		return pImgSecHeaderCursor;
+	}
+	return NULL;
+}
+
+static ULONG_PTR RawAddressFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress) {
+	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
+	ULONG_PTR uiAddress = 0;
+
+	pImgSecHeader = SectionHeaderFromRVA(pDosHeader, pVirtualAddress);
+	if (pImgSecHeader) {
+		uiAddress = (ULONG_PTR)pDosHeader;
+		uiAddress += pVirtualAddress - pImgSecHeader->VirtualAddress;
+		uiAddress += pImgSecHeader->PointerToRawData;
+	}
+	return uiAddress;
+}
+
+static DWORD ImageSizeFromHeaders(PDOS_HEADER pDosHeader) {
+	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeaderLastRaw = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = NULL;
 	DWORD dwCursor = 0;
 
+	pImgNtHeaders = (PIMAGE_NT_HEADERS)((ULONG_PTR)pDosHeader + pDosHeader->e_lfanew);
 	pImgSecHeader = (PIMAGE_SECTION_HEADER)((ULONG_PTR)pImgNtHeaders + sizeof(IMAGE_NT_HEADERS));
 	pImgSecHeaderLastRaw = pImgSecHeader;
 	for (dwCursor = 0; dwCursor < pImgNtHeaders->FileHeader.NumberOfSections; dwCursor++) {
@@ -79,7 +79,7 @@ DWORD ImageSizeFromHeaders(PIMAGE_NT_HEADERS pImgNtHeaders) {
 	return (pImgSecHeaderLastRaw->PointerToRawData + pImgSecHeaderLastRaw->SizeOfRawData);
 }
 
-BOOL ReflectiveUnloaderUnimport(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress) {
+static BOOL ReflectiveUnloaderUnimport(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress) {
 	/*
 	* PDOS_HEADER pDosHeader:   Pointer to the DOS header of the blob to patch
 	* ULONG_PTR   pBaseAddress: Pointer to the original loaded PE blob
@@ -110,7 +110,7 @@ BOOL ReflectiveUnloaderUnimport(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress) 
 	return TRUE;
 }
 
-BOOL ReflectiveUnloaderUnrelocate(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress) {
+static BOOL ReflectiveUnloaderUnrelocate(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress) {
 	/*
 	* PDOS_HEADER pDosHeader:   Pointer to the DOS header of the blob to patch
 	* ULONG_PTR   pBaseAddress: Pointer to the original loaded PE blob
@@ -159,17 +159,15 @@ BOOL ReflectiveUnloaderUnrelocate(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress
 	return TRUE;
 }
 
-/* this step is optional */
-BOOL ReflectiveUnloaderRestoreWritable(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress) {
-	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
+// This step is optional
+static BOOL ReflectiveUnloaderRestoreWritable(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress) {
 	PIMAGE_SECTION_HEADER pImgSecHeaderCopy = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeaderDst = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeaderSrc = NULL;
 	DWORD dwImageSize = 0;
 
-	pImgNtHeaders = (PIMAGE_NT_HEADERS)((ULONG_PTR)pDosHeader + pDosHeader->e_lfanew);
-	pImgSecHeaderCopy = SectionHeaderFromName(pImgNtHeaders, ".restore");
+	pImgSecHeaderCopy = SectionHeaderFromName(pDosHeader, ".restore");
 	if (!pImgSecHeaderCopy) {
 		return FALSE;
 	}
@@ -177,7 +175,7 @@ BOOL ReflectiveUnloaderRestoreWritable(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAd
 		return FALSE;
 	}
 
-	dwImageSize = ImageSizeFromHeaders(pImgNtHeaders);
+	dwImageSize = ImageSizeFromHeaders(pDosHeader);
 	pImgSecHeaderCursor = (PIMAGE_SECTION_HEADER)((ULONG_PTR)pDosHeader + pImgSecHeaderCopy->PointerToRawData);
 	while (memcmp(pImgSecHeaderCursor->Name, "\x00\x00\x00\x00\x00\x00\x00\x00", 8)) {
 		pImgSecHeaderSrc = pImgSecHeaderCursor;
@@ -186,7 +184,7 @@ BOOL ReflectiveUnloaderRestoreWritable(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAd
 		if (!pImgSecHeaderSrc->SizeOfRawData) {
 			continue;
 		}
-		pImgSecHeaderDst = SectionHeaderFromName(pImgNtHeaders, pImgSecHeaderSrc->Name);
+		pImgSecHeaderDst = SectionHeaderFromName(pDosHeader, pImgSecHeaderSrc->Name);
 		if (!pImgSecHeaderDst) {
 			return FALSE;
 		}
@@ -250,7 +248,7 @@ PVOID ReflectiveUnloader(HINSTANCE hInstance, PSIZE_T pdwSize) {
 		return NULL;
 	}
 
-	dwImageSize = ImageSizeFromHeaders(pImgNtHeaders);
+	dwImageSize = ImageSizeFromHeaders(pDosHeader);
 #ifdef DEBUG
 	pBaseAddress = (ULONG_PTR)VirtualAlloc(NULL, dwImageSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 #else
