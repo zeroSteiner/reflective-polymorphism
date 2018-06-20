@@ -58,7 +58,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstDll, DWORD dwReason, LPVOID lpReserved) {
 	case DLL_PROCESS_ATTACH:
 		if (!g_hModule) {
 			g_hModule = hInstDll;
-			/* start a new thread so DllMain returns */
+			// start a new thread so DllMain returns
 			CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ProofOfConcept, hInstDll, 0, 0);
 		}
 		break;

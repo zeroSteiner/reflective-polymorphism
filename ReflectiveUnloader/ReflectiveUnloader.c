@@ -80,10 +80,9 @@ static DWORD ImageSizeFromHeaders(PDOS_HEADER pDosHeader) {
 }
 
 static BOOL ReflectiveUnloaderUnimport(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress) {
-	/*
-	* PDOS_HEADER pDosHeader:   Pointer to the DOS header of the blob to patch
-	* ULONG_PTR   pBaseAddress: Pointer to the original loaded PE blob
-	*/
+	// PDOS_HEADER pDosHeader: Pointer to the DOS header of the blob to patch.
+	// ULONG_PTR pBaseAddress: Pointer to the original loaded PE blob.
+	// Returns: TRUE on success.
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	PIMAGE_DATA_DIRECTORY pImgDataDirectory = NULL;
 	PIMAGE_IMPORT_DESCRIPTOR pImgImpDesc = NULL;
@@ -111,10 +110,9 @@ static BOOL ReflectiveUnloaderUnimport(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAd
 }
 
 static BOOL ReflectiveUnloaderUnrelocate(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress) {
-	/*
-	* PDOS_HEADER pDosHeader:   Pointer to the DOS header of the blob to patch
-	* ULONG_PTR   pBaseAddress: Pointer to the original loaded PE blob
-	*/
+	// PDOS_HEADER pDosHeader: Pointer to the DOS header of the blob to patch.
+	// ULONG_PTR pBaseAddress: Pointer to the original loaded PE blob.
+	// Returns: TRUE on success.
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	PIMAGE_DATA_DIRECTORY pImgDataDirectory = NULL;
 	PIMAGE_BASE_RELOCATION pImgBaseReloc = NULL;
@@ -130,7 +128,7 @@ static BOOL ReflectiveUnloaderUnrelocate(PDOS_HEADER pDosHeader, ULONG_PTR pBase
 	}
 
 	uiRebaseDelta = pBaseAddress - (ULONG_PTR)(pImgNtHeaders->OptionalHeader.ImageBase);
-	/* pImgBaseReloc is now the first entry */
+	// pImgBaseReloc is now the first entry
 	pImgBaseReloc = (PIMAGE_BASE_RELOCATION)(pBaseAddress + pImgDataDirectory->VirtualAddress);
 	while (pImgBaseReloc->SizeOfBlock) {
 		uiRebaseBlock = RawAddressFromRVA(pDosHeader, pImgBaseReloc->VirtualAddress);
@@ -204,12 +202,10 @@ static BOOL ReflectiveUnloaderRestoreWritable(PDOS_HEADER pDosHeader, ULONG_PTR 
 }
 
 VOID ReflectiveUnloaderFree(PVOID pAddress, SIZE_T dwSize) {
-	/*
-	 * Free memory that was previously allocated by ReflectiveUnloader().
-	 *
-	 * PVOID  pAddress: Pointer to the blob returned by ReflectiveUnloader
-	 * SIZE_T dwSize:   Size of the blob returned by ReflectiveUnloader
-	 */
+	// Free memory that was previously allocated by ReflectiveUnloader().
+	//
+	// PVOID pAddress: Pointer to the blob returned by ReflectiveUnloader.
+	// SIZE_T dwSize:  Size of the blob returned by ReflectiveUnloader.
 	SecureZeroMemory(pAddress, dwSize);
 #ifdef DEBUG
 	VirtualFree(pAddress, dwSize, MEM_DECOMMIT | MEM_RELEASE);
@@ -220,13 +216,12 @@ VOID ReflectiveUnloaderFree(PVOID pAddress, SIZE_T dwSize) {
 }
 
 PVOID ReflectiveUnloader(HINSTANCE hInstance, PSIZE_T pdwSize) {
-	/*
-	 * Unload the module indicated by hInstance and return a pointer to it's
-	 * location in memory. If this function fails, NULL is returned.
-	 *
-	 * HINSTANCE hInstance: Handle to the module instance to unload from memory
-	 * PSIZE_T   pdwSize:   The size of the returned PE image
-	 */
+	// Unload the module indicated by hInstance and return a pointer to it's
+	// location in memory. If this function fails, NULL is returned.
+	//
+	// HINSTANCE hInstance: Handle to the module instance to unload from memory.
+	// PSIZE_T pdwSize:     The size of the returned PE image.
+	// Returns: A pointer to a blob of the unloaded PE image.
 	PDOS_HEADER pDosHeader = NULL;
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
@@ -265,10 +260,8 @@ PVOID ReflectiveUnloader(HINSTANCE hInstance, PSIZE_T pdwSize) {
 	pImgNtHeaders = (PIMAGE_NT_HEADERS)((ULONG_PTR)pDosHeader + pDosHeader->e_lfanew);
 	pImgSecHeader = (PIMAGE_SECTION_HEADER)((ULONG_PTR)pImgNtHeaders + sizeof(IMAGE_NT_HEADERS));
 
-	/*
-	 * 0x00400000 for EXEs and 0x10000000 for DLLs
-	 * see: https://msdn.microsoft.com/en-us/library/windows/desktop/ms680339(v=vs.85).aspx
-	 */
+	// 0x00400000 for EXEs and 0x10000000 for DLLs
+	// see: https://msdn.microsoft.com/en-us/library/windows/desktop/ms680339(v=vs.85).aspx
 	if (pImgNtHeaders->FileHeader.Characteristics & IMAGE_FILE_DLL) {
 		pImgNtHeaders->OptionalHeader.ImageBase = IMAGE_BASE_DLL;
 	}

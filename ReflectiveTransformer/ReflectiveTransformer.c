@@ -51,7 +51,7 @@ BOOL DOSHeaderIsEXE(PDOS_HEADER pDosHeader) {
 	// not a DLL (IMAGE_FILE_DLL).
 	//
 	// PDOS_HEADER pDosHeader: Pointer to the DOS header to analyze.
-	// Returns: TRUE if pDosHeader is an EXE
+	// Returns: TRUE if pDosHeader is an EXE.
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	WORD wCharacteristics = 0;
 
