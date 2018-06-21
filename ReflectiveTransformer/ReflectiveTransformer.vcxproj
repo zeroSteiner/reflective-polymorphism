@@ -68,21 +68,21 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName).x64</TargetName>
+    <TargetName>$(ProjectName).$(PlatformTarget)</TargetName>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName).x64</TargetName>
+    <TargetName>$(ProjectName).$(PlatformTarget)</TargetName>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>$(ProjectName).x86</TargetName>
+    <TargetName>$(ProjectName).$(PlatformTarget)</TargetName>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>$(ProjectName).x86</TargetName>
+    <TargetName>$(ProjectName).$(PlatformTarget)</TargetName>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -95,6 +95,7 @@
     </ClCompile>
     <Link>
       <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <AdditionalDependencies>$(SolutionDir)$(Configuration)\ReflectiveUnloader.$(PlatformTarget).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>python $(SolutionDir)pe_patch.py "$(TargetPath)" "$(TargetPath)"</Command>
@@ -113,6 +114,7 @@
     </ClCompile>
     <Link>
       <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <AdditionalDependencies>$(SolutionDir)$(Configuration)\ReflectiveUnloader.$(PlatformTarget).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>python $(SolutionDir)pe_patch.py "$(TargetPath)" "$(TargetPath)"</Command>
@@ -135,6 +137,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <AdditionalDependencies>$(SolutionDir)$(Configuration)\ReflectiveUnloader.$(PlatformTarget).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>python $(SolutionDir)pe_patch.py "$(TargetPath)" "$(TargetPath)"</Command>
@@ -157,6 +160,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <AdditionalDependencies>$(SolutionDir)$(Configuration)\ReflectiveUnloader.$(PlatformTarget).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>python $(SolutionDir)pe_patch.py "$(TargetPath)" "$(TargetPath)"</Command>
@@ -169,7 +173,6 @@
     <ClInclude Include="ReflectiveTransformer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\ReflectiveUnloader\ReflectiveUnloader.c" />
     <ClCompile Include="Main.c" />
     <ClCompile Include="ReflectiveTransformer.c" />
   </ItemGroup>

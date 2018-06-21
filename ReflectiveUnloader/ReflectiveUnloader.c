@@ -5,7 +5,7 @@ typedef struct {
 	WORD    type   :4;
 } IMAGE_RELOC, *PIMAGE_RELOC;
 
-PIMAGE_SECTION_HEADER SectionHeaderFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pAddress) {
+__declspec(dllexport) PIMAGE_SECTION_HEADER SectionHeaderFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pAddress) {
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = NULL;
@@ -29,7 +29,7 @@ PIMAGE_SECTION_HEADER SectionHeaderFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pAd
 	return NULL;
 }
 
-PIMAGE_SECTION_HEADER SectionHeaderFromName(PDOS_HEADER pDosHeader, PVOID pName) {
+__declspec(dllexport) PIMAGE_SECTION_HEADER SectionHeaderFromName(PDOS_HEADER pDosHeader, PVOID pName) {
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = NULL;
@@ -201,7 +201,7 @@ static BOOL ReflectiveUnloaderRestoreWritable(PDOS_HEADER pDosHeader, ULONG_PTR 
 	return TRUE;
 }
 
-VOID ReflectiveUnloaderFree(PVOID pAddress, SIZE_T dwSize) {
+__declspec(dllexport) VOID ReflectiveUnloaderFree(PVOID pAddress, SIZE_T dwSize) {
 	// Free memory that was previously allocated by ReflectiveUnloader().
 	//
 	// PVOID pAddress: Pointer to the blob returned by ReflectiveUnloader.
@@ -215,7 +215,7 @@ VOID ReflectiveUnloaderFree(PVOID pAddress, SIZE_T dwSize) {
 	return;
 }
 
-PVOID ReflectiveUnloader(HINSTANCE hInstance, PSIZE_T pdwSize) {
+__declspec(dllexport) PVOID ReflectiveUnloader(HINSTANCE hInstance, PSIZE_T pdwSize) {
 	// Unload the module indicated by hInstance and return a pointer to it's
 	// location in memory. If this function fails, NULL is returned.
 	//

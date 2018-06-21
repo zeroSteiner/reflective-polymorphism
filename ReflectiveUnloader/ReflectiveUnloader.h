@@ -71,10 +71,10 @@ typedef struct {
 } DOS_HEADER, *PDOS_HEADER;
 
 // API functions
-PVOID ReflectiveUnloader(HINSTANCE hInstance, PSIZE_T pdwSize);
-VOID ReflectiveUnloaderFree(PVOID pAddress, SIZE_T dwSize);
+__declspec(dllexport) PVOID ReflectiveUnloader(HINSTANCE hInstance, PSIZE_T pdwSize);
+__declspec(dllexport) VOID ReflectiveUnloaderFree(PVOID pAddress, SIZE_T dwSize);
 
-PIMAGE_SECTION_HEADER SectionHeaderFromName(PDOS_HEADER pDosHeader, PVOID pName);
-PIMAGE_SECTION_HEADER SectionHeaderFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pAddress);
+__declspec(dllexport) PIMAGE_SECTION_HEADER SectionHeaderFromName(PDOS_HEADER pDosHeader, PVOID pName);
+__declspec(dllexport) PIMAGE_SECTION_HEADER SectionHeaderFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pAddress);
 
 #endif
