@@ -4,8 +4,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectiveUnloader", "ReflectiveUnloader\ReflectiveUnloader.vcxproj", "{AD12EF2E-8527-470F-B7BE-DFF1F78D4A14}"
+	ProjectSection(ProjectDependencies) = postProject
+		{21F0940F-B412-4BE3-87D0-55F446D8BA00} = {21F0940F-B412-4BE3-87D0-55F446D8BA00}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectiveTransformer", "ReflectiveTransformer\ReflectiveTransformer.vcxproj", "{5B67CECE-45A5-4291-8331-C75A428A4B79}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AD12EF2E-8527-470F-B7BE-DFF1F78D4A14} = {AD12EF2E-8527-470F-B7BE-DFF1F78D4A14}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectiveDLLInjection", "ReflectiveDLLInjection.vcxproj", "{21F0940F-B412-4BE3-87D0-55F446D8BA00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +39,14 @@ Global
 		{5B67CECE-45A5-4291-8331-C75A428A4B79}.Release|x64.Build.0 = Release|x64
 		{5B67CECE-45A5-4291-8331-C75A428A4B79}.Release|x86.ActiveCfg = Release|Win32
 		{5B67CECE-45A5-4291-8331-C75A428A4B79}.Release|x86.Build.0 = Release|Win32
+		{21F0940F-B412-4BE3-87D0-55F446D8BA00}.Debug|x64.ActiveCfg = Debug|x64
+		{21F0940F-B412-4BE3-87D0-55F446D8BA00}.Debug|x64.Build.0 = Debug|x64
+		{21F0940F-B412-4BE3-87D0-55F446D8BA00}.Debug|x86.ActiveCfg = Debug|Win32
+		{21F0940F-B412-4BE3-87D0-55F446D8BA00}.Debug|x86.Build.0 = Debug|Win32
+		{21F0940F-B412-4BE3-87D0-55F446D8BA00}.Release|x64.ActiveCfg = Release|x64
+		{21F0940F-B412-4BE3-87D0-55F446D8BA00}.Release|x64.Build.0 = Release|x64
+		{21F0940F-B412-4BE3-87D0-55F446D8BA00}.Release|x86.ActiveCfg = Release|Win32
+		{21F0940F-B412-4BE3-87D0-55F446D8BA00}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
