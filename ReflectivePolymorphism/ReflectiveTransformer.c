@@ -30,7 +30,7 @@ BOOL DOSHeaderIsDLL(PDOS_HEADER pDosHeader) {
 	// image is marked as both executable (IMAGE_FILE_EXECUTABLE_IMAGE) and
 	// a DLL (IMAGE_FILE_DLL).
 	//
-	// PDOS_HEADER pDosHeader:   Pointer to the DOS header to analyze
+	// PDOS_HEADER pDosHeader: A pPointer to the DOS header to analyze
 	// Returns: TRUE if pDosHeader is a DLL
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	WORD wCharacteristics = 0;
@@ -50,7 +50,7 @@ BOOL DOSHeaderIsEXE(PDOS_HEADER pDosHeader) {
 	// image is marked as both executable (IMAGE_FILE_EXECUTABLE_IMAGE) and
 	// not a DLL (IMAGE_FILE_DLL).
 	//
-	// PDOS_HEADER pDosHeader: Pointer to the DOS header to analyze.
+	// PDOS_HEADER pDosHeader: A pointer to the DOS header to analyze.
 	// Returns: TRUE if pDosHeader is an EXE.
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	WORD wCharacteristics = 0;
@@ -70,7 +70,7 @@ BOOL ReflectiveTransformerToDLL(PDOS_HEADER pDosHeader, DWORD dwAddressOfEntryPo
 	// Characteristics field as necessary, updates the OptionalHeader ImageBase
 	// to the default value for DLL files and sets a new entry point.
 	//
-	// PDOS_HEADER pDosHeader:      Pointer to the DOS header transform.
+	// PDOS_HEADER pDosHeader:      A pointer to the DOS header transform.
 	// DWORD dwAddressOfEntryPoint: The RVA of the new entry point for the PE
 	//                              image.
 	// Returns: TRUE on success.
@@ -93,7 +93,7 @@ BOOL ReflectiveTransformerToEXE(PDOS_HEADER pDosHeader, DWORD dwAddressOfEntryPo
 	// Characteristics field as necessary, updates the OptionalHeader ImageBase
 	// to the default value for EXE files and sets a new entry point.
 	//
-	// PDOS_HEADER pDosHeader:      Pointer to the DOS header transform.
+	// PDOS_HEADER pDosHeader:      A pointer to the DOS header transform.
 	// DWORD dwAddressOfEntryPoint: The RVA of the new entry point for the PE
 	//                              image.
 	// Returns: TRUE on success.
@@ -117,11 +117,11 @@ DWORD RVAFromExportName(PDOS_HEADER pDosHeader, LPCSTR lpProcName) {
 	// dwAddressOfEntryPoint argument to the ReflectiveTransformerTo* set of
 	// functions.
 	//
-	// PDOS_HEADER pDosHeader: Pointer to the DOS header of the PE image to
+	// PDOS_HEADER pDosHeader: A pointer to the DOS header of the PE image to
 	//                         resolve the export from.
-	// LPCSTR lpProcName:      Pointer to the name of the exported function to
+	// LPCSTR lpProcName:      A pointer to the name of the exported function to
 	//                         resolve the RVA for.
-	// Returns: A non-zero value on success.
+	// Returns: The function returns a non-zero value on success.
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	PIMAGE_EXPORT_DIRECTORY pImgExDir = NULL;
 	PIMAGE_DATA_DIRECTORY pImgDataDir = NULL;

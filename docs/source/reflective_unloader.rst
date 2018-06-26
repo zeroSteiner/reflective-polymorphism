@@ -1,3 +1,5 @@
+.. _Reflective Unloader:
+
 Reflective Unloader
 ===================
 
@@ -13,14 +15,20 @@ Usage
 -----
 
 1. The build environment is Visual Studio 2017.
-2. Add ``ReflectiveUnloader.c \ ReflectiveUnloader.h`` to the desired project.
-   Once added, call ``ReflectiveUnloader()`` with a handle to the module to
-   unload and reconstruct.
+2. Add the following files to the project:
+
+   - ReflectivePolymorphism.c
+   - ReflectivePolymorphism.h
+   - ReflectiveUnloader.c
+   - ReflectiveUnloader.h
+
+3. Once the necessary files have been added, call ``ReflectiveUnloader()`` with
+   a handle to the module to unload and reconstruct.
 
    -  For an executable this could be ``GetModuleHandle(NULL)``\ :sup:`1`
    -  For a DLL this could be ``hinstDLL`` from ``DllMain``
 
-3. After compiling the project, run ``pe_patch.py`` to patch in necessary data
+4. After compiling the project, run ``pe_patch.py`` to patch in necessary data
    to the pe file. Without this step, the writable sections of the PE file will
    be corrupted in the unloaded copy. (See
    `below <#visual-studio-build-event>`__ for how to automate this.)
@@ -78,12 +86,11 @@ ReflectiveUnloader
    The size of the returned PE image.
 
 **Return value**
+   If the function succeeds, a pointer to the unloaded PE image is returned. The
+   data at this address is then suitable for reuse for other purposes such as
+   being written to disk or injected into another process.
 
-If the function succeeds, a pointer to the unloaded PE image is returned. The
-data at this address is then suitable for reuse for other purposes such as being
-written to disk or injected into another process.
-
-If the function fails, the return value is ``NULL``.
+   If the function fails, the return value is ``NULL``.
 
 ReflectiveUnloaderFree
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -101,24 +108,4 @@ ReflectiveUnloaderFree
 *dwSize* [in]
    Size of the blob returned by ReflectiveUnloader.
 
-Proof of Concept
-----------------
-
-The proof of concept included in the project is the ``Main.c`` file. This can be
-compiled into a ``ReflectiveUnloader.dll`` which is compartible with `Reflective
-DLL Injection`_. The resulting executable can then be injected into an arbitrary
-process (assuming premissions and architecture constraints are met) with the
-`inject.exe`_ utility. Take note of the hash of the DLL file before proceeding.
-See the `releases page`_ for pre-built binaries.
-
-Once the DLL is injected into a process, it will display a message box. This is
-used to present the user with an opportunity to delete the original DLL from
-disk. After the message box is closed, a new and identical copy will be written
-to ``%USERPROFILE%\Desktop\ReflectiveUnloader.dll``.
-
-Finally the user can compare the hashes of the two files to determine that they
-are identical.
-
-.. _inject.exe: https://github.com/stephenfewer/ReflectiveDLLInjection/tree/master/bin
 .. _Reflective DLL Injection: https://github.com/stephenfewer/ReflectiveDLLInjection
-.. _releases page: https://github.com/zeroSteiner/reflective-unloader/releases>
