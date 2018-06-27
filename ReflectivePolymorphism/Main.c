@@ -44,7 +44,7 @@ static VOID DumpDLLImage(PDOS_HEADER pDosHeader, SIZE_T dwSize) {
 
 	dwEntryRVA = RVAFromExportName(pDosHeader, "DllMain");
 	if (!dwEntryRVA) {
-		MessageBox(NULL, _T("Failed to find the rva of the DllMain export."), _T("Failed"), MB_OK);
+		MessageBox(NULL, _T("Failed to find the RVA of the DllMain export."), _T("Failed"), MB_OK);
 		return;
 	}
 	if (!ReflectiveTransformerToDLL(pDosHeader, dwEntryRVA)) {
@@ -74,7 +74,7 @@ static VOID DumpEXEImage(PDOS_HEADER pDosHeader, SIZE_T dwSize) {
 
 	dwEntryRVA = RVAFromExportName(pDosHeader, "ExeMain");
 	if (!dwEntryRVA) {
-		MessageBox(NULL, _T("Failed to find the rva of the ExeMain export."), _T("Failed"), MB_OK);
+		MessageBox(NULL, _T("Failed to find the RVA of the ExeMain export."), _T("Failed"), MB_OK);
 		return;
 	}
 	if (!ReflectiveTransformerToEXE(pDosHeader, dwEntryRVA)) {
@@ -102,7 +102,8 @@ static VOID ProofOfConcept(HINSTANCE hInstance) {
 	ReflectiveUnloaderFree(pDosHeader, dwSize);
 }
 
-__declspec(dllexport) BOOL WINAPI DllMain(HINSTANCE hInstDll, DWORD dwReason, LPVOID lpReserved) {
+BOOL WINAPI DllMain(HINSTANCE hInstDll, DWORD dwReason, LPVOID lpReserved) {
+#pragma comment(linker, "/EXPORT:"__FUNCTION__"="__FUNCDNAME__)
 	if (dwReason == DLL_QUERY_HMODULE) {
 		if (lpReserved) {
 			*(HMODULE *)lpReserved = g_hModule;
@@ -121,7 +122,8 @@ __declspec(dllexport) BOOL WINAPI DllMain(HINSTANCE hInstDll, DWORD dwReason, LP
 	return TRUE;
 }
 
-__declspec(dllexport) int WINAPI ExeMain(int argc, char **argv) {
+int WINAPI ExeMain(int argc, char **argv) {
+#pragma comment(linker, "/EXPORT:"__FUNCTION__"="__FUNCDNAME__)
 	ProofOfConcept(GetModuleHandle(NULL));
 	return 0;
 }

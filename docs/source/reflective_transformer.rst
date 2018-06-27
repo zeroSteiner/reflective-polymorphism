@@ -19,7 +19,7 @@ Usage
    - ReflectiveTransformer.c
    - ReflectiveTransformer.h
 
-3. Set the project to build a DLL.
+3. Set the "Configuration Type" to "Dynamic Library (.dll)".
 
 API Reference
 -------------
