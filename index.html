@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to Reflective Polymorphism’s documentation! &mdash; Reflective Polymorphism 1.1.0 documentation</title>
+  <title>Reflective Polymorphism Documentation &mdash; Reflective Polymorphism 1.1.0 documentation</title>
   
 
   
@@ -133,7 +133,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>Welcome to Reflective Polymorphism’s documentation!</li>
+      <li>Reflective Polymorphism Documentation</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -152,8 +152,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="welcome-to-reflective-polymorphism-s-documentation">
-<h1>Welcome to Reflective Polymorphism’s documentation!<a class="headerlink" href="#welcome-to-reflective-polymorphism-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="reflective-polymorphism-documentation">
+<h1>Reflective Polymorphism Documentation<a class="headerlink" href="#reflective-polymorphism-documentation" title="Permalink to this headline">¶</a></h1>
 <p>This project provides various utilities for the self-modification of PE images
 ith the intention that they can be incorporated into external projects.</p>
 <p>The source code is available on the <a class="reference external" href="https://github.com/zeroSteiner/reflective-polymorphism">GitHub homepage</a>.</p>
@@ -172,6 +172,19 @@ ith the intention that they can be incorporated into external projects.</p>
 </li>
 </ul>
 </div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The Reflective Polymorphism projects is currently composed of the following two
+components each of which are contained within their respective <code class="docutils literal notranslate"><span class="pre">.c</span></code> / <code class="docutils literal notranslate"><span class="pre">.h</span></code>
+files.</p>
+<dl class="docutils">
+<dt><strong>ReflectiveTransformer</strong></dt>
+<dd>Functionality to transform PE files between DLL and EXE formats.</dd>
+<dt><strong>ReflectiveUnloader</strong></dt>
+<dd>Functionality to copy a loaded PE image out of memory and reconstruct a byte
+for byte copy of the PE image as it would exist on disk.</dd>
+</dl>
+</div>
 <div class="section" id="proof-of-concept">
 <h2>Proof of Concept<a class="headerlink" href="#proof-of-concept" title="Permalink to this headline">¶</a></h2>
 <p>The proof of concept included in the project is the <code class="docutils literal notranslate"><span class="pre">Main.c</span></code> file. This can be
@@ -179,7 +192,7 @@ compiled into a <code class="docutils literal notranslate"><span class="pre">Ref
 <a class="reference external" href="https://github.com/stephenfewer/ReflectiveDLLInjection">Reflective DLL Injection</a>. The resulting executable can then be injected into
 an arbitrary process (assuming premissions and architecture constraints are met)
 with the <a class="reference external" href="https://github.com/stephenfewer/ReflectiveDLLInjection/tree/master/bin">inject.exe</a> utility. Take note of the hash of the DLL file before
-proceeding. See the <a class="reference external" href="https://github.com/zeroSteiner/reflective-unloader/releases&gt;">releases page</a> for pre-built binaries.</p>
+proceeding. See the <a class="reference external" href="https://github.com/zeroSteiner/reflective-unloader/releases">releases page</a> for pre-built binaries.</p>
 <p>Once the DLL is injected into a process, it will display a message box. This is
 used to present the user with an opportunity to delete the original PE file from
 disk. After the message box is closed, the following two new files will be
