@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Reflective Polymorphism's documentation!
-===================================================
+Reflective Polymorphism Documentation
+=====================================
 This project provides various utilities for the self-modification of PE images
 ith the intention that they can be incorporated into external projects.
 
@@ -16,6 +16,19 @@ The source code is available on the `GitHub homepage`_.
 
    reflective_transformer.rst
    reflective_unloader.rst
+
+Overview
+--------
+The Reflective Polymorphism projects is currently composed of the following two
+components each of which are contained within their respective ``.c`` / ``.h``
+files and are capabile of operating independently.
+
+**ReflectiveTransformer**
+   Functionality to transform PE files between DLL and EXE formats.
+
+**ReflectiveUnloader**
+   Functionality to copy a loaded PE image out of memory and reconstruct a byte
+   for byte copy of the PE image as it would exist on disk.
 
 Proof of Concept
 ----------------
