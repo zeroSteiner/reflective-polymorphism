@@ -51,4 +51,5 @@ Indices and tables
 
 .. _GitHub homepage: https://github.com/zeroSteiner/reflective-polymorphism
 .. _inject.exe: https://github.com/stephenfewer/ReflectiveDLLInjection/tree/master/bin
-.. _releases page: https://github.com/zeroSteiner/reflective-unloader/releases>
+.. _Reflective DLL Injection: https://github.com/stephenfewer/ReflectiveDLLInjection
+.. _releases page: https://github.com/zeroSteiner/reflective-unloader/releases
