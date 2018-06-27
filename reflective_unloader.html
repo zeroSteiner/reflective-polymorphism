@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Reflective Unloader &mdash; Reflective Polymorphism 1.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Reflective Polymorphism 1.1.0 documentation" href="index.html"/>
+        <link rel="prev" title="Reflective Transformer" href="reflective_transformer.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Reflective Polymorphism
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="reflective_transformer.html">Reflective Transformer</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reflective Unloader</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pe-patching">PE Patching</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#visual-studio-build-event">Visual Studio Build Event</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#api-reference">API Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#reflectiveunloader">ReflectiveUnloader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reflectiveunloaderfree">ReflectiveUnloaderFree</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Reflective Polymorphism</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Reflective Unloader</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/reflective_unloader.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="reflective-unloader">
+<span id="id1"></span><h1>Reflective Unloader<a class="headerlink" href="#reflective-unloader" title="Permalink to this headline">¶</a></h1>
+<p>This is code that can be used within a PE file to allow it to reflectively
+reconstruct itself in memory at runtime. The result is a byte for byte copy of
+the original PE file. This can be combined with <a class="reference external" href="https://github.com/stephenfewer/ReflectiveDLLInjection">Reflective DLL Injection</a> to
+allow code to reconstruct itself after being loaded through an arbitrary means.</p>
+<p>The original PE file will not be modified in memory, this code makes a new copy
+of the unloaded target module.</p>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>The build environment is Visual Studio 2017.</li>
+<li>Add the following files to the project:<ul>
+<li>ReflectivePolymorphism.c</li>
+<li>ReflectivePolymorphism.h</li>
+<li>ReflectiveUnloader.c</li>
+<li>ReflectiveUnloader.h</li>
+</ul>
+</li>
+<li>Once the necessary files have been added, call <code class="docutils literal notranslate"><span class="pre">ReflectiveUnloader()</span></code> with
+a handle to the module to unload and reconstruct.<ul>
+<li>For an executable this could be <code class="docutils literal notranslate"><span class="pre">GetModuleHandle(NULL)</span></code><sup>1</sup></li>
+<li>For a DLL this could be <code class="docutils literal notranslate"><span class="pre">hinstDLL</span></code> from <code class="docutils literal notranslate"><span class="pre">DllMain</span></code></li>
+</ul>
+</li>
+<li>After compiling the project, run <code class="docutils literal notranslate"><span class="pre">pe_patch.py</span></code> to patch in necessary data
+to the pe file. Without this step, the writable sections of the PE file will
+be corrupted in the unloaded copy. (See
+<a class="reference external" href="#visual-studio-build-event">below</a> for how to automate this.)</li>
+</ol>
+<div class="section" id="pe-patching">
+<h3>PE Patching<a class="headerlink" href="#pe-patching" title="Permalink to this headline">¶</a></h3>
+<p>It’s necessary to patch the PE file to get a perfect byte-for-byte copy when it
+is reconstructed. The patching process creates a new <code class="docutils literal notranslate"><span class="pre">.restore</span></code> section where
+a copy of all writable sections are backed up. When the <code class="docutils literal notranslate"><span class="pre">ReflectiveUnloader</span></code>
+function is then called, it will process this extra section to restore the
+original contents to the writable sections.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">.restore</span></code> section is not present, the unloader will simply skip this
+step. This allows the unloader to perform the same task for arbitrary unpatched
+PE files, however <strong>any modifications to segments made at runtime will be
+present in the unloaded PE file</strong>.</p>
+<div class="section" id="visual-studio-build-event">
+<h4>Visual Studio Build Event<a class="headerlink" href="#visual-studio-build-event" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">pe_patch.py</span></code> script can be executed automatically for every build using a
+build event. Right click the project in Solution Explorer, then navigate to
+<code class="docutils literal notranslate"><span class="pre">Configuration</span> <span class="pre">Properties</span> <span class="pre">&gt;</span> <span class="pre">Build</span> <span class="pre">Events</span> <span class="pre">&gt;</span> <span class="pre">Post</span> <span class="pre">Build</span> <span class="pre">Event</span></code> and adjust the
+settings as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="82%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Setting Name</th>
+<th class="head">Setting Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Command Line</td>
+<td><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">$(SolutionDir)pe_patch.py</span> <span class="pre">&quot;$(TargetPath)&quot;</span>
+<span class="pre">&quot;$(TargetPath)&quot;</span></code></td>
+</tr>
+<tr class="row-odd"><td>Description</td>
+<td>Patch in the .restore section</td>
+</tr>
+<tr class="row-even"><td>Use In Build</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="reflectiveunloader">
+<h3>ReflectiveUnloader<a class="headerlink" href="#reflectiveunloader" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">PVOID</span> <span class="nf">ReflectiveUnloader</span><span class="p">(</span>
+  <span class="n">_In_</span>  <span class="n">HINSTANCE</span> <span class="n">hInstance</span><span class="p">,</span>
+  <span class="n">_Out_</span> <span class="n">PSIZE_T</span>   <span class="n">pdwSize</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><em>hInstance</em> [in]</dt>
+<dd>Handle to the module instance to unload from memory.</dd>
+<dt><em>pdwSize</em> [out]</dt>
+<dd>The size of the returned PE image.</dd>
+<dt><strong>Return value</strong></dt>
+<dd><p class="first">If the function succeeds, a pointer to the unloaded PE image is returned. The
+data at this address is then suitable for reuse for other purposes such as
+being written to disk or injected into another process.</p>
+<p class="last">If the function fails, the return value is <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="reflectiveunloaderfree">
+<h3>ReflectiveUnloaderFree<a class="headerlink" href="#reflectiveunloaderfree" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">VOID</span> <span class="nf">ReflectiveUnloaderFree</span><span class="p">(</span>
+  <span class="n">_In_</span> <span class="n">PVOID</span>  <span class="n">pAddress</span><span class="p">,</span>
+  <span class="n">_In_</span> <span class="n">SIZE_T</span> <span class="n">dwSize</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><em>pAddress</em> [in]</dt>
+<dd>A pointer to the blob returned by ReflectiveUnloader.</dd>
+<dt><em>dwSize</em> [in]</dt>
+<dd>Size of the blob returned by ReflectiveUnloader.</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="reflective_transformer.html" class="btn btn-neutral" title="Reflective Transformer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Spencer McIntyre.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
