@@ -1,23 +1,5 @@
 #include "ReflectiveUnloader.h"
 
-typedef struct {
-	WORD    offset :12;
-	WORD    type   :4;
-} IMAGE_RELOC, *PIMAGE_RELOC;
-
-static ULONG_PTR RawAddressFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress) {
-	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
-	ULONG_PTR uiAddress = 0;
-
-	pImgSecHeader = SectionHeaderFromRVA(pDosHeader, pVirtualAddress);
-	if (pImgSecHeader) {
-		uiAddress = (ULONG_PTR)pDosHeader;
-		uiAddress += pVirtualAddress - pImgSecHeader->VirtualAddress;
-		uiAddress += pImgSecHeader->PointerToRawData;
-	}
-	return uiAddress;
-}
-
 static DWORD ImageSizeFromHeaders(PDOS_HEADER pDosHeader) {
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
@@ -37,21 +19,8 @@ static DWORD ImageSizeFromHeaders(PDOS_HEADER pDosHeader) {
 	return (pImgSecHeaderLastRaw->PointerToRawData + pImgSecHeaderLastRaw->SizeOfRawData);
 }
 
-static ULONG_PTR OffsetFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress) {
-	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
-
-	pImgSecHeader = SectionHeaderFromRVA(pDosHeader, pVirtualAddress);
-	if (!pImgSecHeader) {
-		return 0;
-	}
-	pVirtualAddress -= pImgSecHeader->VirtualAddress;
-	pVirtualAddress += pImgSecHeader->PointerToRawData;
-	return pVirtualAddress;
-}
-
-static BOOL ReflectiveUnloaderUnimport(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress) {
+static BOOL ReflectiveUnloaderUnimport(PDOS_HEADER pDosHeader) {
 	// PDOS_HEADER pDosHeader: Pointer to the DOS header of the blob to patch.
-	// ULONG_PTR pBaseAddress: Pointer to the original loaded PE blob.
 	// Returns: TRUE on success.
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	PIMAGE_DATA_DIRECTORY pImgDataDirectory = NULL;
@@ -65,10 +34,10 @@ static BOOL ReflectiveUnloaderUnimport(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAd
 		return FALSE;
 	}
 
-	pImgImpDesc = (PIMAGE_IMPORT_DESCRIPTOR)((ULONG_PTR)pDosHeader + OffsetFromRVA(pDosHeader, pImgDataDirectory->VirtualAddress));
+	pImgImpDesc = (PIMAGE_IMPORT_DESCRIPTOR)((ULONG_PTR)pDosHeader + PAFromRVA(pDosHeader, pImgDataDirectory->VirtualAddress));
 	while (pImgImpDesc->Name) {
-		uiValueD = RawAddressFromRVA(pDosHeader, pImgImpDesc->OriginalFirstThunk);
-		uiValueA = RawAddressFromRVA(pDosHeader, pImgImpDesc->FirstThunk);
+		uiValueD = VAFromRVA(pDosHeader, pImgImpDesc->OriginalFirstThunk);
+		uiValueA = VAFromRVA(pDosHeader, pImgImpDesc->FirstThunk);
 		while (DEREF(uiValueA) && DEREF(uiValueD)) {
 			DEREF(uiValueA) = DEREF(uiValueD);
 			uiValueA += sizeof(ULONG_PTR);
@@ -85,11 +54,6 @@ static BOOL ReflectiveUnloaderUnrelocate(PDOS_HEADER pDosHeader, ULONG_PTR pBase
 	// Returns: TRUE on success.
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	PIMAGE_DATA_DIRECTORY pImgDataDirectory = NULL;
-	PIMAGE_BASE_RELOCATION pImgBaseReloc = NULL;
-	PIMAGE_RELOC pImgReloc = NULL;
-	DWORD dwBlockEntries;
-	ULONG_PTR uiRebaseBlock;
-	ULONG_PTR uiRebaseDelta;
 
 	pImgNtHeaders = (PIMAGE_NT_HEADERS)((ULONG_PTR)pDosHeader + pDosHeader->e_lfanew);
 	pImgDataDirectory = &pImgNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
@@ -97,38 +61,17 @@ static BOOL ReflectiveUnloaderUnrelocate(PDOS_HEADER pDosHeader, ULONG_PTR pBase
 		return FALSE;
 	}
 
-	uiRebaseDelta = pBaseAddress - (ULONG_PTR)(pImgNtHeaders->OptionalHeader.ImageBase);
-	// pImgBaseReloc is now the first entry
-	pImgBaseReloc = (PIMAGE_BASE_RELOCATION)(pBaseAddress + pImgDataDirectory->VirtualAddress);
-	while (pImgBaseReloc->SizeOfBlock) {
-		uiRebaseBlock = RawAddressFromRVA(pDosHeader, pImgBaseReloc->VirtualAddress);
-		if (uiRebaseBlock) {
-			dwBlockEntries = (pImgBaseReloc->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(IMAGE_RELOC);
-			pImgReloc = (PIMAGE_RELOC)((ULONG_PTR)pImgBaseReloc + sizeof(IMAGE_BASE_RELOCATION));
-
-			while (dwBlockEntries--) {
-				if (pImgReloc->type == IMAGE_REL_BASED_DIR64) {
-					*(ULONG_PTR *)(uiRebaseBlock + pImgReloc->offset) -= uiRebaseDelta;
-				}
-				else if (pImgReloc->type == IMAGE_REL_BASED_HIGHLOW) {
-					*(DWORD *)(uiRebaseBlock + pImgReloc->offset) -= (DWORD)uiRebaseDelta;
-				}
-				else if (pImgReloc->type == IMAGE_REL_BASED_HIGH) {
-					*(WORD *)(uiRebaseBlock + pImgReloc->offset) -= HIWORD(uiRebaseDelta);
-				}
-				else if (pImgReloc->type == IMAGE_REL_BASED_LOW) {
-					*(WORD *)(uiRebaseBlock + pImgReloc->offset) -= LOWORD(uiRebaseDelta);
-				}
-				pImgReloc += 1;
-			}
-		}
-		pImgBaseReloc = (PIMAGE_BASE_RELOCATION)((ULONG_PTR)pImgBaseReloc + pImgBaseReloc->SizeOfBlock);
-	}
-	return TRUE;
+	return RebaseImage(pDosHeader, pBaseAddress, (ULONG_PTR)(pImgNtHeaders->OptionalHeader.ImageBase));
 }
 
-// This step is optional
-static BOOL ReflectiveUnloaderRestoreWritable(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress) {
+static BOOL ReflectiveUnloaderRestoreWritable(PDOS_HEADER pDosHeader) {
+	// Restore the sections that were backed up in the ".restore" section if it
+	// is present. If the ".restore" section is not present, this function will
+	// return FALSE and the resulting PE image will probably be corrupted due to
+	// changes made to writeable sections persisting in the unloaded copy.
+	//
+	// PDOS_HEADER pDosHeader: Pointer to the DOS header of the blob to patch.
+	// Returns: TRUE on success.
 	PIMAGE_SECTION_HEADER pImgSecHeaderCopy = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeaderDst = NULL;
@@ -253,8 +196,9 @@ PVOID ReflectiveUnloader(HINSTANCE hInstance, PSIZE_T pdwSize) {
 	}
 
 	ReflectiveUnloaderUnrelocate(pDosHeader, pBaseAddress);
-	ReflectiveUnloaderUnimport(pDosHeader, pBaseAddress);
-	ReflectiveUnloaderRestoreWritable(pDosHeader, pBaseAddress);
+	ReflectiveUnloaderUnimport(pDosHeader);
+	// This step is optional
+	ReflectiveUnloaderRestoreWritable(pDosHeader);
 
 	if (pdwSize) {
 		*pdwSize = dwImageSize;

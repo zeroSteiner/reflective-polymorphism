@@ -69,7 +69,14 @@ typedef struct {
 	DWORD e_lfanew;
 } DOS_HEADER, *PDOS_HEADER;
 
+BOOL RebaseImage(PDOS_HEADER pDosHeader, ULONG_PTR uiBaseFrom, ULONG_PTR uiBaseTo);
+
+// Section Header retrieval functions
 PIMAGE_SECTION_HEADER SectionHeaderFromName(PDOS_HEADER pDosHeader, PVOID pName);
-PIMAGE_SECTION_HEADER SectionHeaderFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pAddress);
+PIMAGE_SECTION_HEADER SectionHeaderFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress);
+
+// Relative Virtual Address (RVA) conversion functions
+ULONG_PTR PAFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress);
+ULONG_PTR VAFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress);
 
 #endif

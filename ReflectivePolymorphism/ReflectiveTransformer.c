@@ -13,18 +13,6 @@ static PIMAGE_NT_HEADERS ImageNTHeadersFromDOSHeader(PDOS_HEADER pDosHeader) {
 	return pImgNtHeaders;
 }
 
-static ULONG_PTR OffsetFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress) {
-	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
-
-	pImgSecHeader = SectionHeaderFromRVA(pDosHeader, pVirtualAddress);
-	if (!pImgSecHeader) {
-		return 0;
-	}
-	pVirtualAddress -= pImgSecHeader->VirtualAddress;
-	pVirtualAddress += pImgSecHeader->PointerToRawData;
-	return pVirtualAddress;
-}
-
 BOOL DOSHeaderIsDLL(PDOS_HEADER pDosHeader) {
 	// Check the FileHeader Characteristics field to determine whether the PE
 	// image is marked as both executable (IMAGE_FILE_EXECUTABLE_IMAGE) and
@@ -81,6 +69,8 @@ BOOL ReflectiveTransformerToDLL(PDOS_HEADER pDosHeader, DWORD dwAddressOfEntryPo
 		return FALSE;
 	}
 
+	RebaseImage(pDosHeader, (ULONG_PTR)(pImgNtHeaders->OptionalHeader.ImageBase), IMAGE_BASE_DLL);
+
 	pImgNtHeaders->FileHeader.Characteristics |= IMAGE_FILE_DLL;
 	pImgNtHeaders->FileHeader.Characteristics |= IMAGE_FILE_EXECUTABLE_IMAGE;
 	pImgNtHeaders->OptionalHeader.ImageBase = IMAGE_BASE_DLL;
@@ -103,6 +93,8 @@ BOOL ReflectiveTransformerToEXE(PDOS_HEADER pDosHeader, DWORD dwAddressOfEntryPo
 	if (!pImgNtHeaders) {
 		return FALSE;
 	}
+	
+	RebaseImage(pDosHeader, (ULONG_PTR)(pImgNtHeaders->OptionalHeader.ImageBase), IMAGE_BASE_EXE);
 
 	pImgNtHeaders->FileHeader.Characteristics &= ~IMAGE_FILE_DLL;
 	pImgNtHeaders->FileHeader.Characteristics |= IMAGE_FILE_EXECUTABLE_IMAGE;
@@ -140,20 +132,20 @@ DWORD RVAFromExportName(PDOS_HEADER pDosHeader, LPCSTR lpProcName) {
 		return 0;
 	}
 
-	pImgExDir = (PIMAGE_EXPORT_DIRECTORY)OffsetFromRVA(pDosHeader, (ULONG_PTR)pImgDataDir->VirtualAddress);
+	pImgExDir = (PIMAGE_EXPORT_DIRECTORY)PAFromRVA(pDosHeader, (ULONG_PTR)pImgDataDir->VirtualAddress);
 	if (!pImgExDir) {
 		return 0;
 	}
 	(ULONG_PTR)pImgExDir += (ULONG_PTR)pDosHeader;
 
-	(ULONG_PTR)pdwExAddress = OffsetFromRVA(pDosHeader, pImgExDir->AddressOfFunctions);
+	(ULONG_PTR)pdwExAddress = PAFromRVA(pDosHeader, pImgExDir->AddressOfFunctions);
 	(ULONG_PTR)pdwExAddress += (ULONG_PTR)pDosHeader;
 
-	(ULONG_PTR)pdwExName = OffsetFromRVA(pDosHeader, pImgExDir->AddressOfNames);
+	(ULONG_PTR)pdwExName = PAFromRVA(pDosHeader, pImgExDir->AddressOfNames);
 	(ULONG_PTR)pdwExName += (ULONG_PTR)pDosHeader;
 
 	for (dwCursor = 0; dwCursor < pImgExDir->NumberOfFunctions; dwCursor++) {
-		lpExportName = (LPSTR)OffsetFromRVA(pDosHeader, (ULONG_PTR)pdwExName[dwCursor]);
+		lpExportName = (LPSTR)PAFromRVA(pDosHeader, (ULONG_PTR)pdwExName[dwCursor]);
 		if (!lpExportName) {
 			continue;
 		}

@@ -26,7 +26,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
@@ -36,7 +36,7 @@
     <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
@@ -121,7 +121,7 @@
     </ClCompile>
     <Link>
       <MinimumRequiredVersion />
-      <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <EntryPointSymbol>ExeMain</EntryPointSymbol>
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
@@ -140,7 +140,7 @@
     </ClCompile>
     <Link>
       <MinimumRequiredVersion />
-      <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <EntryPointSymbol>ExeMain</EntryPointSymbol>
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
