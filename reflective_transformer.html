@@ -37,7 +37,7 @@
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="Reflective Polymorphism 1.1.0 documentation" href="index.html"/>
         <link rel="next" title="Reflective Unloader" href="reflective_unloader.html"/>
-        <link rel="prev" title="Welcome to Reflective Polymorphism’s documentation!" href="index.html"/> 
+        <link rel="prev" title="Reflective Polymorphism" href="reflective_polymorphism.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -88,16 +88,10 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="reflective_polymorphism.html">Reflective Polymorphism</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Reflective Transformer</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#api-reference">API Reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#dosheaderisdll">DOSHeaderIsDLL</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dosheaderisexe">DOSHeaderIsEXE</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rvafromexportname">RVAFromExportName</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#reflectivetransformertodll">ReflectiveTransformerToDLL</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#reflectivetransformertoexe">ReflectiveTransformerToEXE</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#api-reference">API Reference</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reflective_unloader.html">Reflective Unloader</a></li>
@@ -186,87 +180,135 @@ format.</p>
 </div>
 <div class="section" id="api-reference">
 <h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="dosheaderisdll">
-<h3>DOSHeaderIsDLL<a class="headerlink" href="#dosheaderisdll" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BOOL</span> <span class="nf">DOSHeaderIsDLL</span><span class="p">(</span>
-  <span class="n">_In_</span>  <span class="n">PDOS_HEADER</span> <span class="n">pDosHeader</span>
-<span class="p">);</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt><em>pDosHeader</em> [in]</dt>
-<dd>A pointer to the DOS header to check.</dd>
-<dt><strong>Return value</strong></dt>
-<dd>The function returns <code class="docutils literal notranslate"><span class="pre">TRUE</span></code> if pDosHeader appears to be representative of a
-DLL file.</dd>
-</dl>
-</div>
-<div class="section" id="dosheaderisexe">
-<h3>DOSHeaderIsEXE<a class="headerlink" href="#dosheaderisexe" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BOOL</span> <span class="nf">DOSHeaderIsEXE</span><span class="p">(</span>
-  <span class="n">_In_</span>  <span class="n">PDOS_HEADER</span> <span class="n">pDosHeader</span>
-<span class="p">);</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt><em>pDosHeader</em> [in]</dt>
-<dd>A pointer to the DOS header to check.</dd>
-<dt><strong>Return value</strong></dt>
-<dd>The function returns <code class="docutils literal notranslate"><span class="pre">TRUE</span></code> if pDosHeader appears to be representative of
-an EXE file.</dd>
-</dl>
-</div>
-<div class="section" id="rvafromexportname">
-<h3>RVAFromExportName<a class="headerlink" href="#rvafromexportname" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">DWORD</span> <span class="nf">RVAFromExportName</span><span class="p">(</span>
-  <span class="n">_In_</span> <span class="n">PDOS_HEADER</span> <span class="n">pDosHeader</span><span class="p">,</span>
-  <span class="n">_In_</span> <span class="n">LPCSTR</span>      <span class="n">lpProcName</span>
-<span class="p">);</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt><em>pDosHeader</em> [in]</dt>
-<dd>A pointer to the DOS header of the PE image to resolve the export from.</dd>
-<dt><em>lpProcName</em> [in]</dt>
-<dd>A pointer to the name of the exported function to resolve the RVA for.</dd>
-<dt><strong>Return value</strong></dt>
-<dd>The function returns a non-zero value on success.</dd>
-</dl>
-</div>
-<div class="section" id="reflectivetransformertodll">
-<h3>ReflectiveTransformerToDLL<a class="headerlink" href="#reflectivetransformertodll" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BOOL</span> <span class="nf">ReflectiveTransformerToDLL</span><span class="p">(</span>
-  <span class="n">_In_</span> <span class="n">PDOS_HEADER</span> <span class="n">pDosHeader</span><span class="p">,</span>
-  <span class="n">_In_</span> <span class="n">DWORD</span> <span class="n">dwAddressOfEntryPoint</span>
-<span class="p">);</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt><em>pDosHeader</em> [in]</dt>
-<dd>A pointer to the DOS header transform.</dd>
-<dt><em>dwAddressOfEntryPoint</em> [in]</dt>
-<dd>The RVA of the new entry point for the PE image.</dd>
-<dt><strong>Return value</strong></dt>
-<dd>The function returns <code class="docutils literal notranslate"><span class="pre">TRUE</span></code> on success.</dd>
-</dl>
-</div>
-<div class="section" id="reflectivetransformertoexe">
-<h3>ReflectiveTransformerToEXE<a class="headerlink" href="#reflectivetransformertoexe" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BOOL</span> <span class="nf">ReflectiveTransformerToEXE</span><span class="p">(</span>
-  <span class="n">_In_</span> <span class="n">PDOS_HEADER</span> <span class="n">pDosHeader</span><span class="p">,</span>
-  <span class="n">_In_</span> <span class="n">DWORD</span> <span class="n">dwAddressOfEntryPoint</span>
-<span class="p">);</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt><em>pDosHeader</em> [in]</dt>
-<dd>A pointer to the DOS header transform.</dd>
-<dt><em>dwAddressOfEntryPoint</em> [in]</dt>
-<dd>The RVA of the new entry point for the PE image.</dd>
-<dt><strong>Return value</strong></dt>
-<dd>The function returns <code class="docutils literal notranslate"><span class="pre">TRUE</span></code> on success.</dd>
-</dl>
-</div>
+<dl class="function">
+<dt id="c.DOSHeaderIsDLL">
+BOOL <code class="descname">DOSHeaderIsDLL</code><span class="sig-paren">(</span>PDOS_HEADER<em>&nbsp;pDosHeader</em><span class="sig-paren">)</span><a class="headerlink" href="#c.DOSHeaderIsDLL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the FileHeader Characteristics field to determine whether the PE image
+is marked as both executable (IMAGE_FILE_EXECUTABLE_IMAGE) and a DLL
+(IMAGE_FILE_DLL).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pDosHeader</strong> (<em>PDOS_HEADER</em>) – A pointer to the DOS header to analyze.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal notranslate"><span class="pre">TRUE</span></code> if <em>pDosHeader</em> is a DLL.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">BOOL</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.DOSHeaderIsEXE">
+BOOL <code class="descname">DOSHeaderIsEXE</code><span class="sig-paren">(</span>PDOS_HEADER<em>&nbsp;pDosHeader</em><span class="sig-paren">)</span><a class="headerlink" href="#c.DOSHeaderIsEXE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the FileHeader Characteristics field to determine whether the PE image
+is marked as both executable (IMAGE_FILE_EXECUTABLE_IMAGE) and not a DLL
+(IMAGE_FILE_DLL).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pDosHeader</strong> (<em>PDOS_HEADER</em>) – A pointer to the DOS header to analyze.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal notranslate"><span class="pre">TRUE</span></code> if <em>pDosHeader</em> is an EXE.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">BOOL</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.ReflectiveTransformerToDLL">
+BOOL <code class="descname">ReflectiveTransformerToDLL</code><span class="sig-paren">(</span>PDOS_HEADER<em>&nbsp;pDosHeader</em>, DWORD<em>&nbsp;dwAddressOfEntryPoint</em><span class="sig-paren">)</span><a class="headerlink" href="#c.ReflectiveTransformerToDLL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the PE image pDosHeader into a DLL. This updates the FileHeader
+Characteristics field as necessary, updates the OptionalHeader ImageBase to
+the default value for DLL files and sets a new entry point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pDosHeader</strong> (<em>PDOS_HEADER</em>) – A pointer to the DOS header transform.</li>
+<li><strong>dwAddressOfEntryPoint</strong> (<em>DWORD</em>) – The RVA of the new entry point for the PE image.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal notranslate"><span class="pre">TRUE</span></code> on success.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">BOOL</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.ReflectiveTransformerToEXE">
+BOOL <code class="descname">ReflectiveTransformerToEXE</code><span class="sig-paren">(</span>PDOS_HEADER<em>&nbsp;pDosHeader</em>, DWORD<em>&nbsp;dwAddressOfEntryPoint</em><span class="sig-paren">)</span><a class="headerlink" href="#c.ReflectiveTransformerToEXE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the PE image pDosHeader into an EXE. This updates the FileHeader
+Characteristics field as necessary, updates the OptionalHeader ImageBase to
+the default value for EXE files and sets a new entry point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pDosHeader</strong> (<em>PDOS_HEADER</em>) – A pointer to the DOS header transform.</li>
+<li><strong>dwAddressOfEntryPoint</strong> (<em>DWORD</em>) – The RVA of the new entry point for the PE image.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal notranslate"><span class="pre">TRUE</span></code> on success.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">BOOL</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.RVAFromExportName">
+DWORD <code class="descname">RVAFromExportName</code><span class="sig-paren">(</span>PDOS_HEADER<em>&nbsp;pDosHeader</em>, LPCSTR<em>&nbsp;lpProcName</em><span class="sig-paren">)</span><a class="headerlink" href="#c.RVAFromExportName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the relative virtual address (RVA) of an exported function by it’s name
+from an unloaded PE image. The return value can then be used as the
+<em>dwAddressOfEntryPoint</em> argument to the <code class="docutils literal notranslate"><span class="pre">ReflectiveTransformerTo*</span></code> set of
+functions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pDosHeader</strong> (<em>PDOS_HEADER</em>) – A pointer to the DOS header of the PE image to resolve the export from.</li>
+<li><strong>lpProcName</strong> (<em>LPCSTR</em>) – A pointer to the name of the exported function to resolve the RVA for.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The function returns a non-zero value on success.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DWORD</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 </div>
 
@@ -283,7 +325,7 @@ an EXE file.</dd>
         <a href="reflective_unloader.html" class="btn btn-neutral float-right" title="Reflective Unloader" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Welcome to Reflective Polymorphism’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="reflective_polymorphism.html" class="btn btn-neutral" title="Reflective Polymorphism" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -69,43 +69,21 @@ settings as follows:
 API Reference
 -------------
 
-ReflectiveUnloader
-^^^^^^^^^^^^^^^^^^
+.. c:function:: PVOID ReflectiveUnloader(HINSTANCE hInstance, PSIZE_T pdwSize)
 
-.. code-block:: c
+    Unload the module indicated by hInstance and return a pointer to it's
+    location in memory. If this function fails, NULL is returned.
 
-    PVOID ReflectiveUnloader(
-      _In_  HINSTANCE hInstance,
-      _Out_ PSIZE_T   pdwSize
-    );
+    :param HINSTANCE hInstance: Handle to the module instance to unload from memory.
+    :param PSIZE_T pdwSize: The size of the returned PE image.
+    :return: A pointer to a blob of the unloaded PE image.
+    :rtype: PVOID
 
-*hInstance* [in]
-   Handle to the module instance to unload from memory.
+.. c:function:: VOID ReflectiveUnloaderFree(PVOID pAddress, SIZE_T dwSize)
 
-*pdwSize* [out]
-   The size of the returned PE image.
+    Free memory that was previously allocated by ReflectiveUnloader().
 
-**Return value**
-   If the function succeeds, a pointer to the unloaded PE image is returned. The
-   data at this address is then suitable for reuse for other purposes such as
-   being written to disk or injected into another process.
-
-   If the function fails, the return value is ``NULL``.
-
-ReflectiveUnloaderFree
-^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: c
-
-    VOID ReflectiveUnloaderFree(
-      _In_ PVOID  pAddress,
-      _In_ SIZE_T dwSize
-    );
-
-*pAddress* [in]
-   A pointer to the blob returned by ReflectiveUnloader.
-
-*dwSize* [in]
-   Size of the blob returned by ReflectiveUnloader.
+    :param PVOID pAddress: Pointer to the blob returned by ReflectiveUnloader.
+    :param SIZE_T dwSize: Size of the blob returned by ReflectiveUnloader.
 
 .. _Reflective DLL Injection: https://github.com/stephenfewer/ReflectiveDLLInjection

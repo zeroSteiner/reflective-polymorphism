@@ -87,6 +87,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="reflective_polymorphism.html">Reflective Polymorphism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reflective_transformer.html">Reflective Transformer</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Reflective Unloader</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a><ul>
@@ -96,11 +97,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#api-reference">API Reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#reflectiveunloader">ReflectiveUnloader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#reflectiveunloaderfree">ReflectiveUnloaderFree</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#api-reference">API Reference</a></li>
 </ul>
 </li>
 </ul>
@@ -241,42 +238,49 @@ settings as follows:</p>
 </div>
 <div class="section" id="api-reference">
 <h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="reflectiveunloader">
-<h3>ReflectiveUnloader<a class="headerlink" href="#reflectiveunloader" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">PVOID</span> <span class="nf">ReflectiveUnloader</span><span class="p">(</span>
-  <span class="n">_In_</span>  <span class="n">HINSTANCE</span> <span class="n">hInstance</span><span class="p">,</span>
-  <span class="n">_Out_</span> <span class="n">PSIZE_T</span>   <span class="n">pdwSize</span>
-<span class="p">);</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt><em>hInstance</em> [in]</dt>
-<dd>Handle to the module instance to unload from memory.</dd>
-<dt><em>pdwSize</em> [out]</dt>
-<dd>The size of the returned PE image.</dd>
-<dt><strong>Return value</strong></dt>
-<dd><p class="first">If the function succeeds, a pointer to the unloaded PE image is returned. The
-data at this address is then suitable for reuse for other purposes such as
-being written to disk or injected into another process.</p>
-<p class="last">If the function fails, the return value is <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
-</dd>
-</dl>
-</div>
-<div class="section" id="reflectiveunloaderfree">
-<h3>ReflectiveUnloaderFree<a class="headerlink" href="#reflectiveunloaderfree" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">VOID</span> <span class="nf">ReflectiveUnloaderFree</span><span class="p">(</span>
-  <span class="n">_In_</span> <span class="n">PVOID</span>  <span class="n">pAddress</span><span class="p">,</span>
-  <span class="n">_In_</span> <span class="n">SIZE_T</span> <span class="n">dwSize</span>
-<span class="p">);</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt><em>pAddress</em> [in]</dt>
-<dd>A pointer to the blob returned by ReflectiveUnloader.</dd>
-<dt><em>dwSize</em> [in]</dt>
-<dd>Size of the blob returned by ReflectiveUnloader.</dd>
-</dl>
-</div>
+<dl class="function">
+<dt id="c.ReflectiveUnloader">
+PVOID <code class="descname">ReflectiveUnloader</code><span class="sig-paren">(</span>HINSTANCE<em>&nbsp;hInstance</em>, PSIZE_T<em>&nbsp;pdwSize</em><span class="sig-paren">)</span><a class="headerlink" href="#c.ReflectiveUnloader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unload the module indicated by hInstance and return a pointer to it’s
+location in memory. If this function fails, NULL is returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hInstance</strong> (<em>HINSTANCE</em>) – Handle to the module instance to unload from memory.</li>
+<li><strong>pdwSize</strong> (<em>PSIZE_T</em>) – The size of the returned PE image.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A pointer to a blob of the unloaded PE image.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">PVOID</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.ReflectiveUnloaderFree">
+VOID <code class="descname">ReflectiveUnloaderFree</code><span class="sig-paren">(</span>PVOID<em>&nbsp;pAddress</em>, SIZE_T<em>&nbsp;dwSize</em><span class="sig-paren">)</span><a class="headerlink" href="#c.ReflectiveUnloaderFree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Free memory that was previously allocated by ReflectiveUnloader().</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pAddress</strong> (<em>PVOID</em>) – Pointer to the blob returned by ReflectiveUnloader.</li>
+<li><strong>dwSize</strong> (<em>SIZE_T</em>) – Size of the blob returned by ReflectiveUnloader.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 </div>
 
