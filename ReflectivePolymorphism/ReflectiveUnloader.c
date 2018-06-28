@@ -37,6 +37,18 @@ static DWORD ImageSizeFromHeaders(PDOS_HEADER pDosHeader) {
 	return (pImgSecHeaderLastRaw->PointerToRawData + pImgSecHeaderLastRaw->SizeOfRawData);
 }
 
+static ULONG_PTR OffsetFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress) {
+	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
+
+	pImgSecHeader = SectionHeaderFromRVA(pDosHeader, pVirtualAddress);
+	if (!pImgSecHeader) {
+		return 0;
+	}
+	pVirtualAddress -= pImgSecHeader->VirtualAddress;
+	pVirtualAddress += pImgSecHeader->PointerToRawData;
+	return pVirtualAddress;
+}
+
 static BOOL ReflectiveUnloaderUnimport(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAddress) {
 	// PDOS_HEADER pDosHeader: Pointer to the DOS header of the blob to patch.
 	// ULONG_PTR pBaseAddress: Pointer to the original loaded PE blob.
@@ -53,7 +65,7 @@ static BOOL ReflectiveUnloaderUnimport(PDOS_HEADER pDosHeader, ULONG_PTR pBaseAd
 		return FALSE;
 	}
 
-	pImgImpDesc = (PIMAGE_IMPORT_DESCRIPTOR)(pBaseAddress + pImgDataDirectory->VirtualAddress);
+	pImgImpDesc = (PIMAGE_IMPORT_DESCRIPTOR)((ULONG_PTR)pDosHeader + OffsetFromRVA(pDosHeader, pImgDataDirectory->VirtualAddress));
 	while (pImgImpDesc->Name) {
 		uiValueD = RawAddressFromRVA(pDosHeader, pImgImpDesc->OriginalFirstThunk);
 		uiValueA = RawAddressFromRVA(pDosHeader, pImgImpDesc->FirstThunk);

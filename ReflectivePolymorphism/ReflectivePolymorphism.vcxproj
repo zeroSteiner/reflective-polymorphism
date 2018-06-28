@@ -103,6 +103,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <MinimumRequiredVersion />
       <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>python $(SolutionDir)pe_patch.py "$(TargetPath)" "$(TargetPath)"</Command>
@@ -121,6 +122,7 @@
     <Link>
       <MinimumRequiredVersion />
       <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>python $(SolutionDir)pe_patch.py "$(TargetPath)" "$(TargetPath)"</Command>
@@ -139,6 +141,7 @@
     <Link>
       <MinimumRequiredVersion />
       <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>python $(SolutionDir)pe_patch.py "$(TargetPath)" "$(TargetPath)"</Command>
@@ -161,6 +164,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <MinimumRequiredVersion />
       <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>python $(SolutionDir)pe_patch.py "$(TargetPath)" "$(TargetPath)"</Command>
