@@ -1,24 +1,5 @@
 #include "ReflectiveUnloader.h"
 
-static DWORD ImageSizeFromHeaders(PDOS_HEADER pDosHeader) {
-	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
-	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
-	PIMAGE_SECTION_HEADER pImgSecHeaderLastRaw = NULL;
-	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = NULL;
-	DWORD dwCursor = 0;
-
-	pImgNtHeaders = (PIMAGE_NT_HEADERS)((ULONG_PTR)pDosHeader + pDosHeader->e_lfanew);
-	pImgSecHeader = (PIMAGE_SECTION_HEADER)((ULONG_PTR)pImgNtHeaders + sizeof(IMAGE_NT_HEADERS));
-	pImgSecHeaderLastRaw = pImgSecHeader;
-	for (dwCursor = 0; dwCursor < pImgNtHeaders->FileHeader.NumberOfSections; dwCursor++) {
-		pImgSecHeaderCursor = &pImgSecHeader[dwCursor];
-		if (pImgSecHeaderLastRaw->PointerToRawData < pImgSecHeaderCursor->PointerToRawData) {
-			pImgSecHeaderLastRaw = pImgSecHeaderCursor;
-		}
-	}
-	return (pImgSecHeaderLastRaw->PointerToRawData + pImgSecHeaderLastRaw->SizeOfRawData);
-}
-
 static BOOL ReflectiveUnloaderUnimport(PDOS_HEADER pDosHeader) {
 	// PDOS_HEADER pDosHeader: Pointer to the DOS header of the blob to patch.
 	// Returns: TRUE on success.
@@ -62,56 +43,6 @@ static BOOL ReflectiveUnloaderUnrelocate(PDOS_HEADER pDosHeader, ULONG_PTR pBase
 	}
 
 	return RebaseImage(pDosHeader, pBaseAddress, (ULONG_PTR)(pImgNtHeaders->OptionalHeader.ImageBase));
-}
-
-static BOOL ReflectiveUnloaderRestoreWritable(PDOS_HEADER pDosHeader) {
-	// Restore the sections that were backed up in the ".restore" section if it
-	// is present. If the ".restore" section is not present, this function will
-	// return FALSE and the resulting PE image will probably be corrupted due to
-	// changes made to writeable sections persisting in the unloaded copy.
-	//
-	// PDOS_HEADER pDosHeader: Pointer to the DOS header of the blob to patch.
-	// Returns: TRUE on success.
-	PIMAGE_SECTION_HEADER pImgSecHeaderCopy = NULL;
-	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = NULL;
-	PIMAGE_SECTION_HEADER pImgSecHeaderDst = NULL;
-	PIMAGE_SECTION_HEADER pImgSecHeaderSrc = NULL;
-	DWORD dwImageSize = 0;
-
-	pImgSecHeaderCopy = SectionHeaderFromName(pDosHeader, ".restore");
-	if (!pImgSecHeaderCopy) {
-		return FALSE;
-	}
-	if (!pImgSecHeaderCopy->SizeOfRawData) {
-		return FALSE;
-	}
-
-	dwImageSize = ImageSizeFromHeaders(pDosHeader);
-	pImgSecHeaderCursor = (PIMAGE_SECTION_HEADER)((ULONG_PTR)pDosHeader + pImgSecHeaderCopy->PointerToRawData);
-	while (memcmp(pImgSecHeaderCursor->Name, "\x00\x00\x00\x00\x00\x00\x00\x00", 8)) {
-		pImgSecHeaderSrc = pImgSecHeaderCursor;
-		pImgSecHeaderCursor += 1;
-
-		if (!pImgSecHeaderSrc->SizeOfRawData) {
-			continue;
-		}
-		pImgSecHeaderDst = SectionHeaderFromName(pDosHeader, pImgSecHeaderSrc->Name);
-		if (!pImgSecHeaderDst) {
-			return FALSE;
-		}
-		if (pImgSecHeaderDst->SizeOfRawData != pImgSecHeaderSrc->SizeOfRawData) {
-			return FALSE;
-		}
-		if (dwImageSize < (pImgSecHeaderCursor->PointerToRawData + pImgSecHeaderCursor->SizeOfRawData)) {
-			return FALSE;
-		}
-		CopyMemory(
-			(PVOID)((ULONG_PTR)pDosHeader + pImgSecHeaderDst->PointerToRawData),
-			(PVOID)((ULONG_PTR)pDosHeader + pImgSecHeaderSrc->PointerToRawData),
-			pImgSecHeaderDst->SizeOfRawData
-		);
-	}
-	return TRUE;
 }
 
 VOID ReflectiveUnloaderFree(PVOID pAddress, SIZE_T dwSize) {
@@ -198,7 +129,7 @@ PVOID ReflectiveUnloader(HINSTANCE hInstance, PSIZE_T pdwSize) {
 	ReflectiveUnloaderUnrelocate(pDosHeader, pBaseAddress);
 	ReflectiveUnloaderUnimport(pDosHeader);
 	// This step is optional
-	ReflectiveUnloaderRestoreWritable(pDosHeader);
+	ShadowSectionRestore(pDosHeader);
 
 	if (pdwSize) {
 		*pdwSize = dwImageSize;

@@ -69,7 +69,9 @@ BOOL ReflectiveTransformerToDLL(PDOS_HEADER pDosHeader, DWORD dwAddressOfEntryPo
 		return FALSE;
 	}
 
-	RebaseImage(pDosHeader, (ULONG_PTR)(pImgNtHeaders->OptionalHeader.ImageBase), IMAGE_BASE_DLL);
+	if (RebaseImage(pDosHeader, (ULONG_PTR)(pImgNtHeaders->OptionalHeader.ImageBase), IMAGE_BASE_DLL)) {
+		ShadowSectionUpdate(pDosHeader);
+	}
 
 	pImgNtHeaders->FileHeader.Characteristics |= IMAGE_FILE_DLL;
 	pImgNtHeaders->FileHeader.Characteristics |= IMAGE_FILE_EXECUTABLE_IMAGE;
@@ -94,7 +96,9 @@ BOOL ReflectiveTransformerToEXE(PDOS_HEADER pDosHeader, DWORD dwAddressOfEntryPo
 		return FALSE;
 	}
 	
-	RebaseImage(pDosHeader, (ULONG_PTR)(pImgNtHeaders->OptionalHeader.ImageBase), IMAGE_BASE_EXE);
+	if (RebaseImage(pDosHeader, (ULONG_PTR)(pImgNtHeaders->OptionalHeader.ImageBase), IMAGE_BASE_EXE)) {
+		ShadowSectionUpdate(pDosHeader);
+	}
 
 	pImgNtHeaders->FileHeader.Characteristics &= ~IMAGE_FILE_DLL;
 	pImgNtHeaders->FileHeader.Characteristics |= IMAGE_FILE_EXECUTABLE_IMAGE;

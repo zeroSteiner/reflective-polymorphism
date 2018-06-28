@@ -46,6 +46,8 @@
 #define IMAGE_BASE_EXE 0x400000
 #endif
 
+#define SHADOW_SECTION_NAME ".restore"
+
 typedef struct {
 	// short is 2 bytes, long is 4 bytes
 	WORD  signature;
@@ -69,7 +71,13 @@ typedef struct {
 	DWORD e_lfanew;
 } DOS_HEADER, *PDOS_HEADER;
 
+DWORD ImageSizeFromHeaders(PDOS_HEADER pDosHeader);
 BOOL RebaseImage(PDOS_HEADER pDosHeader, ULONG_PTR uiBaseFrom, ULONG_PTR uiBaseTo);
+
+// Shadow section functions
+BOOL ShadowSectionCopy(PDOS_HEADER pDosHeader, BOOL bCopyTo);
+#define ShadowSectionRestore(pDosHeader) ShadowSectionCopy(pDosHeader, FALSE)
+#define ShadowSectionUpdate(pDosHeader) ShadowSectionCopy(pDosHeader, TRUE)
 
 // Section Header retrieval functions
 PIMAGE_SECTION_HEADER SectionHeaderFromName(PDOS_HEADER pDosHeader, PVOID pName);

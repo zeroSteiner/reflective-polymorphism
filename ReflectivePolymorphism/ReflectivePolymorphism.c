@@ -5,6 +5,29 @@ typedef struct {
 	WORD    type : 4;
 } IMAGE_RELOC, *PIMAGE_RELOC;
 
+DWORD ImageSizeFromHeaders(PDOS_HEADER pDosHeader) {
+	// Calculate the size of of a PE image from the specified DOS headers.
+	//
+	// PDOS_HEADER pDosHeader: The headers to use for the calculation.
+	// Returns: The size of the PE image.
+	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
+	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
+	PIMAGE_SECTION_HEADER pImgSecHeaderLastRaw = NULL;
+	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = NULL;
+	DWORD dwCursor = 0;
+
+	pImgNtHeaders = (PIMAGE_NT_HEADERS)((ULONG_PTR)pDosHeader + pDosHeader->e_lfanew);
+	pImgSecHeader = (PIMAGE_SECTION_HEADER)((ULONG_PTR)pImgNtHeaders + sizeof(IMAGE_NT_HEADERS));
+	pImgSecHeaderLastRaw = pImgSecHeader;
+	for (dwCursor = 0; dwCursor < pImgNtHeaders->FileHeader.NumberOfSections; dwCursor++) {
+		pImgSecHeaderCursor = &pImgSecHeader[dwCursor];
+		if (pImgSecHeaderLastRaw->PointerToRawData < pImgSecHeaderCursor->PointerToRawData) {
+			pImgSecHeaderLastRaw = pImgSecHeaderCursor;
+		}
+	}
+	return (pImgSecHeaderLastRaw->PointerToRawData + pImgSecHeaderLastRaw->SizeOfRawData);
+}
+
 BOOL RebaseImage(PDOS_HEADER pDosHeader, ULONG_PTR uiBaseFrom, ULONG_PTR uiBaseTo) {
 	// Rebase the specified PE image by processing the relocation data as
 	// necessary.
@@ -56,6 +79,61 @@ BOOL RebaseImage(PDOS_HEADER pDosHeader, ULONG_PTR uiBaseFrom, ULONG_PTR uiBaseT
 			}
 		}
 		pImgBaseReloc = (PIMAGE_BASE_RELOCATION)((ULONG_PTR)pImgBaseReloc + pImgBaseReloc->SizeOfBlock);
+	}
+	return TRUE;
+}
+
+BOOL ShadowSectionCopy(PDOS_HEADER pDosHeader, BOOL bCopyTo) {
+	// Copy data to or from the shadow section. Copying data from the shadow
+	// section effectively restores content from the backup. Copying data to the
+	// shadow section effectively updates backup content.
+	//
+	// PDOS_HEADER pDosHeader: Pointer to the DOS header of the blob to patch.
+	// Returns: TRUE on success.
+	PIMAGE_SECTION_HEADER pImgSecHeaderCopy = NULL;
+	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = NULL;
+	PIMAGE_SECTION_HEADER pImgSecHeader1 = NULL;
+	PIMAGE_SECTION_HEADER pImgSecHeader2 = NULL;
+	DWORD dwImageSize = 0;
+
+	pImgSecHeaderCopy = SectionHeaderFromName(pDosHeader, SHADOW_SECTION_NAME);
+	if (!pImgSecHeaderCopy) {
+		return FALSE;
+	}
+	if (!pImgSecHeaderCopy->SizeOfRawData) {
+		return FALSE;
+	}
+
+	dwImageSize = ImageSizeFromHeaders(pDosHeader);
+	pImgSecHeaderCursor = (PIMAGE_SECTION_HEADER)((ULONG_PTR)pDosHeader + pImgSecHeaderCopy->PointerToRawData);
+	while (memcmp(pImgSecHeaderCursor->Name, "\x00\x00\x00\x00\x00\x00\x00\x00", 8)) {
+		pImgSecHeader2 = pImgSecHeaderCursor;
+		pImgSecHeaderCursor += 1;
+
+		if (!pImgSecHeader2->SizeOfRawData) {
+			continue;
+		}
+		pImgSecHeader1 = SectionHeaderFromName(pDosHeader, pImgSecHeader2->Name);
+		if (!pImgSecHeader1) {
+			return FALSE;
+		}
+		if (pImgSecHeader1->SizeOfRawData != pImgSecHeader2->SizeOfRawData) {
+			return FALSE;
+		}
+		if (dwImageSize < (pImgSecHeaderCursor->PointerToRawData + pImgSecHeaderCursor->SizeOfRawData)) {
+			return FALSE;
+		}
+		if (bCopyTo) {
+			// swap the pointers if we're copying to the shadow section
+			(ULONG_PTR)pImgSecHeader1 ^= (ULONG_PTR)pImgSecHeader2;
+			(ULONG_PTR)pImgSecHeader2 ^= (ULONG_PTR)pImgSecHeader1;
+			(ULONG_PTR)pImgSecHeader1 ^= (ULONG_PTR)pImgSecHeader2;
+		}
+		CopyMemory(
+			(PVOID)((ULONG_PTR)pDosHeader + pImgSecHeader1->PointerToRawData),
+			(PVOID)((ULONG_PTR)pDosHeader + pImgSecHeader2->PointerToRawData),
+			pImgSecHeader1->SizeOfRawData
+		);
 	}
 	return TRUE;
 }
