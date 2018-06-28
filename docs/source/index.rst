@@ -1,7 +1,7 @@
 Reflective Polymorphism Documentation
 =====================================
 This project provides various utilities for the self-modification of PE images
-ith the intention that they can be incorporated into external projects.
+with the intention that they can be incorporated into external projects.
 
 The source code is available on the `GitHub homepage`_.
 

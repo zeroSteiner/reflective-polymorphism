@@ -1,7 +1,7 @@
 Reflective Polymorphism
 =======================
 This project provides various utilities for the self-modification of PE images
-ith the intention that they can be incorporated into external projects.
+with the intention that they can be incorporated into external projects.
 
 The documentation is available `online`_.
 
