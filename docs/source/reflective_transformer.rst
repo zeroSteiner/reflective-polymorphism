@@ -24,91 +24,56 @@ Usage
 API Reference
 -------------
 
-DOSHeaderIsDLL
-^^^^^^^^^^^^^^
+.. c:function:: BOOL DOSHeaderIsDLL(PDOS_HEADER pDosHeader)
 
-.. code-block:: c
+    Check the FileHeader Characteristics field to determine whether the PE image
+    is marked as both executable (IMAGE_FILE_EXECUTABLE_IMAGE) and a DLL
+    (IMAGE_FILE_DLL).
 
-    BOOL DOSHeaderIsDLL(
-      _In_  PDOS_HEADER pDosHeader
-    );
+    :param PDOS_HEADER pDosHeader: A pointer to the DOS header to analyze.
+    :return: ``TRUE`` if *pDosHeader* is a DLL.
+    :rtype: BOOL
 
-*pDosHeader* [in]
-   A pointer to the DOS header to check.
+.. c:function:: BOOL DOSHeaderIsEXE(PDOS_HEADER pDosHeader)
 
-**Return value**
-   The function returns ``TRUE`` if pDosHeader appears to be representative of a
-   DLL file.
+    Check the FileHeader Characteristics field to determine whether the PE image
+    is marked as both executable (IMAGE_FILE_EXECUTABLE_IMAGE) and not a DLL
+    (IMAGE_FILE_DLL).
 
-DOSHeaderIsEXE
-^^^^^^^^^^^^^^
+    :param PDOS_HEADER pDosHeader: A pointer to the DOS header to analyze.
+    :return: ``TRUE`` if *pDosHeader* is an EXE.
+    :rtype: BOOL
 
-.. code-block:: c
+.. c:function:: BOOL ReflectiveTransformerToDLL(PDOS_HEADER pDosHeader, DWORD dwAddressOfEntryPoint)
 
-    BOOL DOSHeaderIsEXE(
-      _In_  PDOS_HEADER pDosHeader
-    );
+    Transform the PE image pDosHeader into a DLL. This updates the FileHeader
+    Characteristics field as necessary, updates the OptionalHeader ImageBase to
+    the default value for DLL files and sets a new entry point.
 
-*pDosHeader* [in]
-   A pointer to the DOS header to check.
+    :param PDOS_HEADER pDosHeader: A pointer to the DOS header transform.
+    :param DWORD dwAddressOfEntryPoint: The RVA of the new entry point for the PE image.
+    :return: ``TRUE`` on success.
+    :rtype: BOOL
 
-**Return value**
-   The function returns ``TRUE`` if pDosHeader appears to be representative of
-   an EXE file.
+.. c:function:: BOOL ReflectiveTransformerToEXE(PDOS_HEADER pDosHeader, DWORD dwAddressOfEntryPoint)
 
-RVAFromExportName
-^^^^^^^^^^^^^^^^^
+    Transform the PE image pDosHeader into an EXE. This updates the FileHeader
+    Characteristics field as necessary, updates the OptionalHeader ImageBase to
+    the default value for EXE files and sets a new entry point.
 
-.. code-block:: c
+    :param PDOS_HEADER pDosHeader: A pointer to the DOS header transform.
+    :param DWORD dwAddressOfEntryPoint: The RVA of the new entry point for the PE image.
+    :return: ``TRUE`` on success.
+    :rtype: BOOL
 
-    DWORD RVAFromExportName(
-      _In_ PDOS_HEADER pDosHeader,
-      _In_ LPCSTR      lpProcName
-    );
+.. c:function:: DWORD RVAFromExportName(PDOS_HEADER pDosHeader, LPCSTR lpProcName)
 
-*pDosHeader* [in]
-   A pointer to the DOS header of the PE image to resolve the export from.
+    Get the relative virtual address (RVA) of an exported function by it's name
+    from an unloaded PE image. The return value can then be used as the
+    *dwAddressOfEntryPoint* argument to the ``ReflectiveTransformerTo*`` set of
+    functions.
 
-*lpProcName* [in]
-   A pointer to the name of the exported function to resolve the RVA for.
-
-**Return value**
-   The function returns a non-zero value on success.
-
-ReflectiveTransformerToDLL
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: c
-
-    BOOL ReflectiveTransformerToDLL(
-      _In_ PDOS_HEADER pDosHeader,
-      _In_ DWORD dwAddressOfEntryPoint
-    );
-
-*pDosHeader* [in]
-   A pointer to the DOS header transform.
-
-*dwAddressOfEntryPoint* [in]
-    The RVA of the new entry point for the PE image.
-
-**Return value**
-   The function returns ``TRUE`` on success.
-
-ReflectiveTransformerToEXE
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: c
-
-    BOOL ReflectiveTransformerToEXE(
-      _In_ PDOS_HEADER pDosHeader,
-      _In_ DWORD dwAddressOfEntryPoint
-    );
-
-*pDosHeader* [in]
-   A pointer to the DOS header transform.
-
-*dwAddressOfEntryPoint* [in]
-    The RVA of the new entry point for the PE image.
-
-**Return value**
-   The function returns ``TRUE`` on success.
+    :param PDOS_HEADER pDosHeader: A pointer to the DOS header of the PE image to resolve the export from.
+    :param LPCSTR lpProcName: A pointer to the name of the exported function to resolve the RVA for.
+    :return: The function returns a non-zero value on success.
+    :rtype: DWORD

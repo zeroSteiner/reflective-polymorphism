@@ -18,8 +18,8 @@ BOOL DOSHeaderIsDLL(PDOS_HEADER pDosHeader) {
 	// image is marked as both executable (IMAGE_FILE_EXECUTABLE_IMAGE) and
 	// a DLL (IMAGE_FILE_DLL).
 	//
-	// PDOS_HEADER pDosHeader: A pPointer to the DOS header to analyze
-	// Returns: TRUE if pDosHeader is a DLL
+	// PDOS_HEADER pDosHeader: A pointer to the DOS header to analyze.
+	// Returns: TRUE if pDosHeader is a DLL.
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	WORD wCharacteristics = 0;
 

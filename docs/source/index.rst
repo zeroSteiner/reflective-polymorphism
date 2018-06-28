@@ -1,8 +1,3 @@
-.. Reflective Polymorphism documentation master file, created by
-   sphinx-quickstart on Sun Jun 24 00:56:14 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Reflective Polymorphism Documentation
 =====================================
 This project provides various utilities for the self-modification of PE images
@@ -11,11 +6,12 @@ ith the intention that they can be incorporated into external projects.
 The source code is available on the `GitHub homepage`_.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
 
-   reflective_transformer.rst
-   reflective_unloader.rst
+    reflective_polymorphism.rst
+    reflective_transformer.rst
+    reflective_unloader.rst
 
 Overview
 --------
@@ -24,11 +20,11 @@ components each of which are contained within their respective ``.c`` / ``.h``
 files and are capabile of operating independently.
 
 **ReflectiveTransformer**
-   Functionality to transform PE files between DLL and EXE formats.
+    Functionality to transform PE files between DLL and EXE formats.
 
 **ReflectiveUnloader**
-   Functionality to copy a loaded PE image out of memory and reconstruct a byte
-   for byte copy of the PE image as it would exist on disk.
+    Functionality to copy a loaded PE image out of memory and reconstruct a byte
+    for byte copy of the PE image as it would exist on disk.
 
 Proof of Concept
 ----------------
@@ -46,14 +42,14 @@ disk. After the message box is closed, the following two new files will be
 created on the user's desktop.
 
 **ReflectivePolymorphism.dll**
-   This is an identical copy of the injected DLL.
+    This is an identical copy of the injected DLL.
 
 **ReflectivePolymorphism.exe**
-   This is an EXE version of the original, injected DLL.
+    This is an EXE version of the original, injected DLL.
 
 The user can then compare the hashes of the two DLL files to determine that they
-are identical. At that point the user can delete the DLLs an run the EXE version
-which will create the DLL version again at the same path.
+are identical. At that point the user can delete the DLLs and run the EXE
+version which will create the DLL version again at the same path.
 
 Indices and tables
 ==================

@@ -12,11 +12,11 @@ components each of which are contained within their respective ``.c`` / ``.h``
 files and are capabile of operating independently.
 
 **ReflectiveTransformer**
-   Functionality to transform PE files between DLL and EXE formats.
+    Functionality to transform PE files between DLL and EXE formats.
 
 **ReflectiveUnloader**
-   Functionality to copy a loaded PE image out of memory and reconstruct a byte
-   for byte copy of the PE image as it would exist on disk.
+    Functionality to copy a loaded PE image out of memory and reconstruct a byte
+    for byte copy of the PE image as it would exist on disk.
 
 License
 -------

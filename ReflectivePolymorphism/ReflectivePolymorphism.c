@@ -35,7 +35,7 @@ BOOL RebaseImage(PDOS_HEADER pDosHeader, ULONG_PTR uiBaseFrom, ULONG_PTR uiBaseT
 	// PDOS_HEADER pDosHeader: Pointer to the DOS header of the blob to patch.
 	// ULONG_PTR uiBaseFrom:   The address to rebase the image from.
 	// ULONG_PTR uiBaseTo:     The address to rebase the image to.
-	// Returns: TRUE on success.
+	// Returns: The function returns TRUE on success.
 	PIMAGE_NT_HEADERS pImgNtHeaders = NULL;
 	PIMAGE_DATA_DIRECTORY pImgDataDirectory = NULL;
 	PIMAGE_BASE_RELOCATION pImgBaseReloc = NULL;
@@ -89,7 +89,8 @@ BOOL ShadowSectionCopy(PDOS_HEADER pDosHeader, BOOL bCopyTo) {
 	// shadow section effectively updates backup content.
 	//
 	// PDOS_HEADER pDosHeader: Pointer to the DOS header of the blob to patch.
-	// Returns: TRUE on success.
+	// BOOL bCopyTo:           Whether to copy to or from the shadow section.
+	// Returns: The function returns TRUE on success.
 	PIMAGE_SECTION_HEADER pImgSecHeaderCopy = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeaderCursor = NULL;
 	PIMAGE_SECTION_HEADER pImgSecHeader1 = NULL;
@@ -199,9 +200,9 @@ ULONG_PTR PAFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress) {
 	// relation to the DOS header.
 	//
 	// PDOS_HEADER pDosHeader:    A pointer to the associated DOS header.
-	// ULONG_PTR pVirtualAddress: The RVA to convert to a VA.
+	// ULONG_PTR pVirtualAddress: The RVA to convert to a PA.
 	// Returns: The physical address of the specified relative virtual address or
-	//          NULL on failure.
+	//          0 on failure.
 	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
 
 	pImgSecHeader = SectionHeaderFromRVA(pDosHeader, pVirtualAddress);
@@ -220,7 +221,7 @@ ULONG_PTR VAFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress) {
 	// PDOS_HEADER pDosHeader:    A pointer to the associated DOS header.
 	// ULONG_PTR pVirtualAddress: The RVA to convert to a VA.
 	// Returns: The virtual address of the specified relative virtual address or
-	//          NULL on failure.
+	//          0 on failure.
 	PIMAGE_SECTION_HEADER pImgSecHeader = NULL;
 	ULONG_PTR uiAddress = 0;
 
