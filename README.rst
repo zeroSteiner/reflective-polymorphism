@@ -9,7 +9,7 @@ Overview
 --------
 The Reflective Polymorphism projects is currently composed of the following two
 components each of which are contained within their respective ``.c`` / ``.h``
-files and are capabile of operating independently.
+files and are capable of operating independently.
 
 **ReflectiveTransformer**
     Functionality to transform PE files between DLL and EXE formats.
