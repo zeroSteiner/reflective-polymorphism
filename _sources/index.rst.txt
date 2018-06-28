@@ -1,7 +1,7 @@
 Reflective Polymorphism Documentation
 =====================================
 This project provides various utilities for the self-modification of PE images
-ith the intention that they can be incorporated into external projects.
+with the intention that they can be incorporated into external projects.
 
 The source code is available on the `GitHub homepage`_.
 
@@ -17,7 +17,7 @@ Overview
 --------
 The Reflective Polymorphism projects is currently composed of the following two
 components each of which are contained within their respective ``.c`` / ``.h``
-files and are capabile of operating independently.
+files and are capable of operating independently.
 
 **ReflectiveTransformer**
     Functionality to transform PE files between DLL and EXE formats.

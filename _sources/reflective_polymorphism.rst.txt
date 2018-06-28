@@ -60,7 +60,7 @@ API Reference
     :return: A pointer to the section header or ``NULL`` if it could not be found.
     :rtype: PIMAGE_SECTION_HEADER
 
-.. c:funtion:: ULONG_PTR PAFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress)
+.. c:function:: ULONG_PTR PAFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress)
 
     Calculate the Physical Address (VA) from the specified Relative Virtual
     Address (RVA). The Physical Address is the offset within the PE image in
@@ -71,7 +71,7 @@ API Reference
     :return: The physical address of the specified relative virtual address or 0 on failure.
     :rtype: ULONG_PTR
 
-.. c:funtion:: ULONG_PTR VAFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress)
+.. c:function:: ULONG_PTR VAFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress)
 
     Calculate the Virtual Address (VA) from the specified Relative Virtual
     Address (RVA).
