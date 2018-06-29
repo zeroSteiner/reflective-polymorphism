@@ -91,7 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="reflective_transformer.html">Reflective Transformer</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Reflective Unloader</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pe-patching">PE Patching</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#shadow-section">Shadow Section</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shadow-section-contents">Shadow Section Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#visual-studio-build-event">Visual Studio Build Event</a></li>
 </ul>
 </li>
@@ -188,22 +189,47 @@ a handle to the module to unload and reconstruct.<ul>
 <li>For a DLL this could be <code class="docutils literal notranslate"><span class="pre">hinstDLL</span></code> from <code class="docutils literal notranslate"><span class="pre">DllMain</span></code></li>
 </ul>
 </li>
-<li>After compiling the project, run <code class="docutils literal notranslate"><span class="pre">pe_patch.py</span></code> to patch in necessary data
-to the pe file. Without this step, the writable sections of the PE file will
-be corrupted in the unloaded copy. (See
+<li>After compiling the project, run <code class="docutils literal notranslate"><span class="pre">pe_patch.py</span></code> to patch in the necessary
+shadow section data to the PE file. Without this step, the writable sections
+of the PE file will be corrupted in the unloaded copy. (See
 <a class="reference external" href="#visual-studio-build-event">below</a> for how to automate this.)</li>
 </ol>
-<div class="section" id="pe-patching">
-<h3>PE Patching<a class="headerlink" href="#pe-patching" title="Permalink to this headline">¶</a></h3>
-<p>It’s necessary to patch the PE file to get a perfect byte-for-byte copy when it
-is reconstructed. The patching process creates a new <code class="docutils literal notranslate"><span class="pre">.restore</span></code> section where
-a copy of all writable sections are backed up. When the <code class="docutils literal notranslate"><span class="pre">ReflectiveUnloader</span></code>
-function is then called, it will process this extra section to restore the
-original contents to the writable sections.</p>
-<p>If the <code class="docutils literal notranslate"><span class="pre">.restore</span></code> section is not present, the unloader will simply skip this
-step. This allows the unloader to perform the same task for arbitrary unpatched
-PE files, however <strong>any modifications to segments made at runtime will be
-present in the unloaded PE file</strong>.</p>
+<div class="section" id="shadow-section">
+<span id="id2"></span><h3>Shadow Section<a class="headerlink" href="#shadow-section" title="Permalink to this headline">¶</a></h3>
+<p>It’s necessary to patch a reflectively unloadable PE file to get a perfect
+byte-for-byte copy when it is reconstructed. The patching process creates a
+shadow copy of all writable sections in a new section named <code class="docutils literal notranslate"><span class="pre">.restore</span></code>. This
+shadow section is then used when the <code class="docutils literal notranslate"><span class="pre">ReflectiveUnloader</span></code> function is called
+to restore the original contents of the writable sections. Reflectively
+unloadable PE files should be patched once after being compiled.</p>
+<p>If the shadow section is not present, the unloader will simply skip this step.
+This allows the unloader to perform the same task for arbitrary unpatched PE
+files, however <strong>any modifications to segments made at runtime will be present
+in the unloaded PE file</strong>.</p>
+<p>The shadow section is composed of a null-terminated list of
+<code class="docutils literal notranslate"><span class="pre">IMAGE_SECTION_HEADER</span></code> strcutures. The final, null-termination entry has no
+name and is <code class="docutils literal notranslate"><span class="pre">sizeof(IMAGE_SECTION_HEADER)</span></code> null bytes. Each section header’s
+<code class="docutils literal notranslate"><span class="pre">PointerToRawData</span></code> field is updated to point to the associated data. Following
+the list of section headers is the data for each section.</p>
+<div class="section" id="shadow-section-contents">
+<h4>Shadow Section Contents<a class="headerlink" href="#shadow-section-contents" title="Permalink to this headline">¶</a></h4>
+<p>The following is a diagram illustrating an example layout of the shadow
+section’s contents which includes a backup of a single section (the <code class="docutils literal notranslate"><span class="pre">.data</span></code>
+section).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="100%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>IMAGE_SECTION_HEADER (Name: .data\x00)</td>
+</tr>
+<tr class="row-even"><td>IMAGE_SECTION_HEADER (Name: \x00)</td>
+</tr>
+<tr class="row-odd"><td>[ .data section contents ]</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="section" id="visual-studio-build-event">
 <h4>Visual Studio Build Event<a class="headerlink" href="#visual-studio-build-event" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">pe_patch.py</span></code> script can be executed automatically for every build using a

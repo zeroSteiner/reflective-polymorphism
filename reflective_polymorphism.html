@@ -219,7 +219,8 @@ necessary.</p>
 BOOL <code class="descname">ShadowSectionCopy</code><span class="sig-paren">(</span>PDOS_HEADER<em>&nbsp;pDosHeader</em>, BOOL<em>&nbsp;bCopyTo</em><span class="sig-paren">)</span><a class="headerlink" href="#c.ShadowSectionCopy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copy data to or from the shadow section. Copying data from the shadow
 section effectively restores content from the backup. Copying data to the
-shadow section effectively updates backup content.</p>
+shadow section effectively updates backup content. See the
+<a class="reference internal" href="reflective_unloader.html#shadow-section"><span class="std std-ref">Shadow Section</span></a> description for more details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -292,7 +293,7 @@ PIMAGE_SECTION_HEADER <code class="descname">SectionHeaderFromName</code><span c
 <dl class="function">
 <dt id="c.PAFromRVA">
 ULONG_PTR <code class="descname">PAFromRVA</code><span class="sig-paren">(</span>PDOS_HEADER<em>&nbsp;pDosHeader</em>, ULONG_PTR<em>&nbsp;pVirtualAddress</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PAFromRVA" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the Physical Address (VA) from the specified Relative Virtual
+<dd><p>Calculate the Physical Address (PA) from the specified Relative Virtual
 Address (RVA). The Physical Address is the offset within the PE image in
 relation to the DOS header.</p>
 <table class="docutils field-list" frame="void" rules="none">
