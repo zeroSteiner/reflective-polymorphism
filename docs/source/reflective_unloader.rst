@@ -15,6 +15,7 @@ Usage
 -----
 
 1. The build environment is Visual Studio 2017.
+
 2. Add the following files to the project:
 
    - ReflectivePolymorphism.c
@@ -28,24 +29,48 @@ Usage
    -  For an executable this could be ``GetModuleHandle(NULL)``\ :sup:`1`
    -  For a DLL this could be ``hinstDLL`` from ``DllMain``
 
-4. After compiling the project, run ``pe_patch.py`` to patch in necessary data
-   to the pe file. Without this step, the writable sections of the PE file will
-   be corrupted in the unloaded copy. (See
+4. After compiling the project, run ``pe_patch.py`` to patch in the necessary
+   shadow section data to the PE file. Without this step, the writable sections
+   of the PE file will be corrupted in the unloaded copy. (See
    `below <#visual-studio-build-event>`__ for how to automate this.)
 
-PE Patching
-^^^^^^^^^^^
+.. _Shadow Section:
 
-It’s necessary to patch the PE file to get a perfect byte-for-byte copy when it
-is reconstructed. The patching process creates a new ``.restore`` section where
-a copy of all writable sections are backed up. When the ``ReflectiveUnloader``
-function is then called, it will process this extra section to restore the
-original contents to the writable sections.
+Shadow Section
+^^^^^^^^^^^^^^
 
-If the ``.restore`` section is not present, the unloader will simply skip this
-step. This allows the unloader to perform the same task for arbitrary unpatched
-PE files, however **any modifications to segments made at runtime will be
-present in the unloaded PE file**.
+It’s necessary to patch a reflectively unloadable PE file to get a perfect
+byte-for-byte copy when it is reconstructed. The patching process creates a
+shadow copy of all writable sections in a new section named ``.restore``. This
+shadow section is then used when the ``ReflectiveUnloader`` function is called
+to restore the original contents of the writable sections. Reflectively
+unloadable PE files should be patched once after being compiled.
+
+If the shadow section is not present, the unloader will simply skip this step.
+This allows the unloader to perform the same task for arbitrary unpatched PE
+files, however **any modifications to segments made at runtime will be present
+in the unloaded PE file**.
+
+The shadow section is composed of a null-terminated list of
+``IMAGE_SECTION_HEADER`` strcutures. The final, null-termination entry has no
+name and is ``sizeof(IMAGE_SECTION_HEADER)`` null bytes. Each section header's
+``PointerToRawData`` field is updated to point to the associated data. Following
+the list of section headers is the data for each section.
+
+Shadow Section Contents
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The following is a diagram illustrating an example layout of the shadow
+section's contents which includes a backup of a single section (the ``.data``
+section).
+
++-----------------------------------------+
+| IMAGE_SECTION_HEADER (Name: .data\\x00) |
++-----------------------------------------+
+| IMAGE_SECTION_HEADER (Name: \\x00)      |
++-----------------------------------------+
+| [ .data section contents ]              |
++-----------------------------------------+
 
 Visual Studio Build Event
 ~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -195,7 +195,7 @@ PIMAGE_SECTION_HEADER SectionHeaderFromName(PDOS_HEADER pDosHeader, PVOID pName)
 }
 
 ULONG_PTR PAFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress) {
-	// Calculate the Physical Address (VA) from the specified Relative Virtual
+	// Calculate the Physical Address (PA) from the specified Relative Virtual
 	// Address (RVA). The Physical Address is the offset within the PE image in
 	// relation to the DOS header.
 	//

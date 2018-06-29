@@ -34,7 +34,8 @@ API Reference
 
     Copy data to or from the shadow section. Copying data from the shadow
     section effectively restores content from the backup. Copying data to the
-    shadow section effectively updates backup content.
+    shadow section effectively updates backup content. See the
+    :ref:`Shadow Section` description for more details. 
 
     :param PDOS_HEADER pDosHeader: Pointer to the DOS header of the blob to patch.
     :param BOOL bCopyTo: Whether to copy to or from the shadow section.
@@ -62,7 +63,7 @@ API Reference
 
 .. c:function:: ULONG_PTR PAFromRVA(PDOS_HEADER pDosHeader, ULONG_PTR pVirtualAddress)
 
-    Calculate the Physical Address (VA) from the specified Relative Virtual
+    Calculate the Physical Address (PA) from the specified Relative Virtual
     Address (RVA). The Physical Address is the offset within the PE image in
     relation to the DOS header.
 
